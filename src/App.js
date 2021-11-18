@@ -1,5 +1,7 @@
+import React from 'react';
 import logo from './logo.svg';
 import './App.css';
+import '@themesberg/flowbite'; // Not sure if it works
 
 function App() {
   return (
