@@ -1,13 +1,21 @@
 import React from 'react';
+import { Routes, Route } from 'react-router-dom';
+
+// Components
 import Navbar from './components/Navbar';
+import Header from './components/Header';
 import logo from './logo.svg';
-import './App.css';
+
+// Style
+//import './App.css';
 import '@themesberg/flowbite'; // Not sure if it works
 
 function App() {
   return (
-    <div className="App">
+    <div className="App bg-gradient-to-r from-blue-600 to-blue-400">
       <Navbar />
+      <Header />
+      { /*
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
         <p>
@@ -22,6 +30,7 @@ function App() {
           Learn React
         </a>
       </header>
+      */ }
     </div>
   );
 }
