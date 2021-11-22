@@ -56,13 +56,13 @@ const Header = () => {
         !eyeOpen && setPasswordType('password');
     }
     return (
-        <header className="bg-gray-200 bg-opacity-30">
-            <div class="container mx-auto text-center flex flex-wrap items-center justify-evenly p-20">
+        <header className="bg-gradient-to-r from-blue-500 to-blue-400">
+            <div class="container mx-auto text-center flex flex-wrap items-center justify-center gap-4 px-5 py-20 lg:px-10 lg:py-56">
                 <div className="py-10">
-                    <img src={courtImage} className="rounded max-h-80" />
+                    <img src={courtImage} className="rounded w-80 md:w-96 md:h-96" />
                 </div>
                 <div>  
-                    <form className="rounded shadow bg-gray-900 p-8 max-h-80">
+                    <form className="rounded shadow bg-gray-900 p-8 w-80 md:h-96">
                         <div className="mb-6">
                             <label htmlFor="email" className="text-sm font-medium text-gray-200 block mb-2">Username</label>
                             <input type="email" id="email" className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required="" />
