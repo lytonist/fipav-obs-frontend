@@ -1,9 +1,9 @@
 import React from 'react';
+import { Outlet } from 'react-router-dom';
 
 // Components
 import Navbar from './components/Navbar';
 import Title from './components/Title';
-import Header from './components/Header';
 import Footer from './components/Footer';
 
 // Style
@@ -13,8 +13,8 @@ function App() {
   return (
     <div className="App">
       <Navbar />
-      <Title />
-      <Header />
+      <Title title="Portale Osservatori" />
+      <Outlet />
       <Footer />
     </div>
   );
