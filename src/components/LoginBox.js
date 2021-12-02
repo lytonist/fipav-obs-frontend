@@ -1,4 +1,10 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+// Context
+import { useAuth } from "../userContext";
+
+// Api
 
 const LoginBox = () => {
     const icons = [{
@@ -44,7 +50,13 @@ const LoginBox = () => {
     const [ eyeOpen, setEyeOpen ] = useState(true);
     const [ passwordType, setPasswordType ] = useState('password');
     const [ icon, setIcon ] = useState(icons.find(i => !i.status).svg);
+    const [ username, setUsername ] = useState('');
+    const [ password, setPassword ] = useState('');
+    const [ error, setError ] = useState(false);
 
+    const [ user, setUser ] = useAuth();
+    const navigate = useNavigate();
+    
     const toggleEyeOpen = () => {
         setEyeOpen(!eyeOpen);
         const svg = icons.find(i => i.status === eyeOpen).svg;
@@ -53,15 +65,48 @@ const LoginBox = () => {
         !eyeOpen && setPasswordType('password');
     }
 
+    const handleInput = e => {
+        const name = e.currentTarget.name;
+        const value = e.currentTarget.value;
+        if (name === 'username') setUsername(value);
+        if (name === 'password') setPassword(value);
+    }
+
+    const handleSubmit = e => {
+        setError(false);
+        try {
+            // await...
+            setUser(username);
+            navigate('/home');
+        } catch (error) {
+            setError(true);
+        }
+    }
+
     return (
-        <form className="rounded shadow bg-gray-900 p-8 w-80 md:h-96">
+        <form className="rounded shadow bg-gray-900 p-8 w-80 md:h-96" onSubmit={handleSubmit}>
             <div className="mb-6">
-                <label htmlFor="email" className="text-sm font-medium text-gray-200 block mb-2">Username</label>
-                <input type="email" id="email" className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required="" />
+                { error && <div>Impossibile effettuare il Login</div> }
+                <label htmlFor="username" className="text-sm font-medium text-gray-200 block mb-2">Username</label>
+                <input 
+                    type="text"
+                    id="username"
+                    name="username"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                    value={username}
+                    onChange={handleInput}
+                    required="" />
             </div>
             <div className="mb-6 relative">
                 <label htmlFor="password" className="text-sm font-medium text-gray-200 block mb-2">Password</label>
-                <input type={passwordType} id="password" className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-7" required="" />
+                <input
+                    type={passwordType}
+                    id="password"
+                    name="password"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-7"
+                    value={password}
+                    onChange={handleInput}
+                    required="" />
                 <div onClick={toggleEyeOpen}>
                     {icon}
                 </div>

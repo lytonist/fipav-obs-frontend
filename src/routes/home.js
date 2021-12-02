@@ -1,14 +1,23 @@
 import React from 'react';
 
-// Style
-import '@themesberg/flowbite'; // Not sure if it works
+// Auth Context
+import { useAuth } from '../userContext';
 
 const Home = () => {
-  return (
-    <main className="Home">
-      <div>Questa è la Home</div>
-    </main>
-  );
+  const [ user ] = useAuth();
+
+  if (user) {
+    return (
+      <main className="Home">
+        <div>Benvenuto { user }!</div>
+      </main>
+    );
+  } else {
+      return (
+        <div>Not Authorized</div>
+      )
+  }
+
 }
 
 export default Home;
