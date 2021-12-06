@@ -9,8 +9,7 @@ import Title from './components/Title';
 import Footer from './components/Footer';
 
 // Auth Components
-//import AuthProvider from './components/auth/AuthProvider';
-//import RequireAuth from './components/auth/RequireAuth';
+import RequireAuth from './requireAuth';
 
 // Context
 import UserProvider from './userContext';
@@ -36,8 +35,18 @@ function Main() {
       <Navbar />
       <Title title="Portale Osservatori" />
       <Routes>
-        <Route path="/" element={ <Header /> } />
-        <Route path="/home" element={ <Home /> } />
+        <Route
+          path="/"
+          element={ 
+            <Header /> 
+          } />
+        <Route
+          path="/home"
+          element={ 
+            <RequireAuth>
+              <Home />
+            </RequireAuth> 
+          } />
       </Routes>
       <Footer />
     </div>

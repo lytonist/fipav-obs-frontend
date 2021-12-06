@@ -9,7 +9,7 @@ const Home = () => {
   if (user) {
     return (
       <main className="Home">
-        <div>Benvenuto { user }!</div>
+        <div>Benvenuto { user.username }!</div>
       </main>
     );
   } else {

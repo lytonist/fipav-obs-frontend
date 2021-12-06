@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../userContext";
 
 // Api
+import { authProvider as API } from '../API/api';
 
 const LoginBox = () => {
     const icons = [{
@@ -52,7 +53,7 @@ const LoginBox = () => {
     const [ icon, setIcon ] = useState(icons.find(i => !i.status).svg);
     const [ username, setUsername ] = useState('');
     const [ password, setPassword ] = useState('');
-    const [ error, setError ] = useState(false);
+    const [ error, setError ] = useState(undefined);
 
     const [ user, setUser ] = useAuth();
     const navigate = useNavigate();
@@ -72,21 +73,28 @@ const LoginBox = () => {
         if (name === 'password') setPassword(value);
     }
 
-    const handleSubmit = e => {
-        setError(false);
+    const handleSubmit = async e => {
+        e.preventDefault();
+        setError(undefined);
         try {
-            // await...
-            setUser(username);
-            navigate('/home');
-        } catch (error) {
-            setError(true);
+            const body = JSON.stringify({username, password});
+            const response = await API.signin(body);
+            if (response.success) {
+                setUser(response.user);
+                localStorage.setItem('jwt', response.token.token);
+                // navigate('/home');
+            } else {
+                setError(response.msg || 'Qualcosa non va');
+            }
+         } catch (error) {
+            setError('Qualcosa è andato storto');
         }
     }
 
     return (
         <form className="rounded shadow bg-gray-900 p-8 w-80 md:h-96" onSubmit={handleSubmit}>
             <div className="mb-6">
-                { error && <div>Impossibile effettuare il Login</div> }
+                { error && <div className="rounded p-1 bg-red-400 bg-opacity-25 mb-3 ring-4 ring-red-500 text-gray-200">{error}</div> }
                 <label htmlFor="username" className="text-sm font-medium text-gray-200 block mb-2">Username</label>
                 <input 
                     type="text"
@@ -111,14 +119,15 @@ const LoginBox = () => {
                     {icon}
                 </div>
             </div>
-            <div className="flex items-start mb-6">
-                <div className="flex items-center h-5">
+            <div className="mb-6 relative text-gray-200">
+                Password dimenticata?
+{/*                 <div className="flex items-center h-5">
                 <input id="remember" aria-describedby="remember" type="checkbox" className="bg-gray-50 border border-gray-300 focus:ring-3 focus:ring-blue-300 h-4 w-4 rounded" required="" />
                 
                 </div>
                 <div className="text-sm ml-3">
                 <label htmlFor="remember" className="font-medium text-gray-200">Remember me</label>
-                </div>
+                </div> */}
             </div>
             <button type="submit" className="block w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Submit</button>
         </form>
