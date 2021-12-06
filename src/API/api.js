@@ -1,4 +1,5 @@
 import decode from 'jwt-decode';
+import { getToken, removeToken } from '../lib/storageUtils';
 
 const authProvider = {
     signin: async (body) => {
@@ -12,11 +13,11 @@ const authProvider = {
     },
 
     verifyLogin: async () => {
-        const token = localStorage.getItem('jwt');
+        const token = getToken();
         const decoded = token ? decode(token) : undefined;
         if (token && Date.now() / 1000 > decoded.exp) { // il token è scaduto
             console.log('token scaduto');
-            localStorage.removeItem('jwt');
+            removeToken();
             return false;
         }
         if (token && Date.now() / 1000 < decoded.exp) { // il token è ancora valido

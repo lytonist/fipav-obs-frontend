@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { removeToken } from '../lib/storageUtils';
 
 // Context
 import { useAuth } from "../userContext";
@@ -17,23 +18,31 @@ const Navbar = () => {
         });
     }
 
+    const logout = () => {
+        removeToken();
+        setUser(undefined);
+    }
+
     const privateMenu = (
         <>
-            <Link to="/home" className="bg-gray-300 md:bg-transparent text-blue-700 block pl-3 pr-4 py-2 md:text-gray-100 md:p-0 rounded" aria-current="page">
-                <li className="rounded bg-blue-500 hover:bg-blue-600 upper p-2">
-                    Home
-                </li>
-            </Link>
-            <Link to="#" className="hover:bg-blue-400 border-b border-gray-100 md:hover:bg-transparent md:border-0 block pl-3 pr-4 py-2 md:hover:text-blue-700 md:p-0">
+            <Link to="/nuovo-report" className="hover:bg-blue-400 border-b border-gray-100 md:hover:bg-transparent md:border-0 block pl-3 pr-4 py-2 md:hover:text-blue-700 md:p-0">
                 <li className="rounded text-gray-200 hover:text-gray-900 bg-blue-500 hover:bg-blue-600 p-2">
                     Nuovo Report
                 </li>
             </Link>
-            <Link to="#" className="hover:bg-blue-400 border-b border-gray-100 md:hover:bg-transparent md:border-0 block pl-3 pr-4 py-2 md:hover:text-blue-700 md:p-0">
+            <Link to="/report-precedenti" className="hover:bg-blue-400 border-b border-gray-100 md:hover:bg-transparent md:border-0 block pl-3 pr-4 py-2 md:hover:text-blue-700 md:p-0">
                 <li className="rounded bg-blue-500 hover:bg-blue-600 text-gray-200 hover:text-gray-900 p-2">
                     Report Precedenti
                 </li>
             </Link>
+            <button 
+                className="hover:bg-blue-400 border-b border-gray-100 md:hover:bg-transparent md:border-0 block pl-3 pr-4 py-2 md:hover:text-blue-700 md:p-0"
+                onClick={logout}    
+            >
+                <li className="rounded bg-blue-500 hover:bg-blue-600 text-gray-200 hover:text-gray-900 p-2">
+                    Logout
+                </li>
+            </button>
         </>
     );
 

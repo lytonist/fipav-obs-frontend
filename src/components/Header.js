@@ -6,6 +6,7 @@ import { useAuth } from '../userContext';
 
 // Components
 import LoginBox from "./LoginBox";
+import WelcomeBox from "./WelcomeBox";
 
 // Images
 import courtImage from '../images/court.jpg';
@@ -30,7 +31,7 @@ const Header = () => {
                 </div>
                 <div>  
                     { !user && <LoginBox /> }
-                    { user && <div>Benvenuto {user.username}</div> }
+                    { user && <WelcomeBox /> }
                 </div>
             </div>
             

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { setToken } from "../lib/storageUtils";
 
 // Context
 import { useAuth } from "../userContext";
@@ -81,7 +82,7 @@ const LoginBox = () => {
             const response = await API.signin(body);
             if (response.success) {
                 setUser(response.user);
-                localStorage.setItem('jwt', response.token.token);
+                setToken(response.token.token);
                 // navigate('/home');
             } else {
                 setError(response.msg || 'Qualcosa non va');
