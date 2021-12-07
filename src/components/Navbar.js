@@ -25,6 +25,11 @@ const Navbar = () => {
 
     const privateMenu = (
         <>
+            <Link to="/accounts" className="hover:bg-blue-400 border-b border-gray-100 md:hover:bg-transparent md:border-0 block pl-3 pr-4 py-2 md:hover:text-blue-700 md:p-0">
+                <li className="rounded text-gray-200 hover:text-gray-900 bg-blue-500 hover:bg-blue-600 p-2">
+                    Accounts
+                </li>
+            </Link>
             <Link to="/nuovo-report" className="hover:bg-blue-400 border-b border-gray-100 md:hover:bg-transparent md:border-0 block pl-3 pr-4 py-2 md:hover:text-blue-700 md:p-0">
                 <li className="rounded text-gray-200 hover:text-gray-900 bg-blue-500 hover:bg-blue-600 p-2">
                     Nuovo Report

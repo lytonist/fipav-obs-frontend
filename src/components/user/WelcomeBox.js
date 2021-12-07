@@ -1,10 +1,10 @@
 import React from 'react';
 
 // Context
-import { useAuth } from '../userContext';
+import { useAuth } from '../../userContext';
 
 // Icon
-import ball from '../images/icons/volleyball.svg';
+import ball from '../../images/icons/volleyball.svg';
 
 const WelcomeBox = () => {
     const [ user ] = useAuth();

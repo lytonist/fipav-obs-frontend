@@ -1,22 +1,24 @@
+import { Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from './userContext';
 
-// API
-import { authProvider as API } from './API/api';
+const RequireAdmin = ({ children }) => {
+    const [ user ] = useAuth();
+    const navigate = useNavigate();
 
-const RequireAuth = async ({ children }) => {
-    const [ user, setUser ] = useAuth();
+    if (user?.admin)
+        return children;
+    else
+        return <Navigate to="/" />;
+};
 
-    if (!user) {
-        const token = localStorage.getItem('jwt');
-        if (token) {
-            try {
-                const response = await API.verifyLogin(token);
-                return children
-            } catch (err) {
-                console.error(err);
-            }
-        }
-    }
-}
+const RequireUser = ({ children }) => {
+    const [ user ] = useAuth();
+    const navigate = useNavigate();
 
-export default RequireAuth;
+    if (user)
+        return children;
+    else
+    return <Navigate to="/" />;
+};
+
+export { RequireAdmin, RequireUser };

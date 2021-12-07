@@ -7,7 +7,7 @@ export function useAuth() {
 }
 
 const UserProvider = ({ children }) => {
-    const [state, setState] = useState(undefined);
+    const [state, setState] = useState();
 
     return (
         <UserContext.Provider value={[state, setState]}>

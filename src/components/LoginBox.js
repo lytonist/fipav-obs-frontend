@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { setToken } from "../lib/storageUtils";
 
 // Context
@@ -57,7 +56,6 @@ const LoginBox = () => {
     const [ error, setError ] = useState(undefined);
 
     const [ user, setUser ] = useAuth();
-    const navigate = useNavigate();
     
     const toggleEyeOpen = () => {
         setEyeOpen(!eyeOpen);
@@ -83,7 +81,6 @@ const LoginBox = () => {
             if (response.success) {
                 setUser(response.user);
                 setToken(response.token.token);
-                // navigate('/home');
             } else {
                 setError(response.msg || 'Qualcosa non va');
             }
