@@ -1,9 +1,8 @@
-import { Navigate, useNavigate } from 'react-router-dom';
-import { useAuth } from './userContext';
+import { Navigate } from 'react-router-dom';
+import { useAuth } from './contexts/userContext';
 
 const RequireAdmin = ({ children }) => {
     const [ user ] = useAuth();
-    const navigate = useNavigate();
 
     if (user?.admin)
         return children;
@@ -13,12 +12,11 @@ const RequireAdmin = ({ children }) => {
 
 const RequireUser = ({ children }) => {
     const [ user ] = useAuth();
-    const navigate = useNavigate();
 
     if (user)
         return children;
     else
-    return <Navigate to="/" />;
+        return <Navigate to="/" />;
 };
 
 export { RequireAdmin, RequireUser };

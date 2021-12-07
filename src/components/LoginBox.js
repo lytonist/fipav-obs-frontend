@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { setToken } from "../lib/storageUtils";
 
 // Context
-import { useAuth } from "../userContext";
+import { useAuth } from "../contexts/userContext";
 
 // Api
 import { authProvider as API } from '../API/api';

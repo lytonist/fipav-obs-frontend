@@ -12,8 +12,8 @@ import Title      from './components/Title';
 import { RequireAdmin, RequireUser } from './requireAuth';
 
 // Context
-import UserProvider from './userContext';
-import { useAuth } from './userContext';
+import TitleProvider, { useTitle } from './contexts/titleContext';
+import UserProvider from './contexts/userContext';
 
 // Style
 import '@themesberg/flowbite'; // Not sure if it works
@@ -22,19 +22,21 @@ function App() {
 
   return (
     <Router>
-      <UserProvider>
-        <Main />
-      </UserProvider>
+      <TitleProvider>
+        <UserProvider>
+          <Main />
+        </UserProvider>
+      </TitleProvider>
     </Router>
   );
 }
 
 function Main() {
-  const [ user, setUser ] = useAuth();
+  const [ title ] = useTitle();
   return (
     <div className="App">
       <Navbar />
-      <Title title="Portale Osservatori" />
+      <Title title={title} />
       <div className="bg-gradient-to-r from-blue-500 to-blue-400">
         <Routes>
           <Route

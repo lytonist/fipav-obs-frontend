@@ -1,7 +1,7 @@
 import React from 'react';
 
 // Context
-import { useAuth } from '../../userContext';
+import { useAuth } from '../../contexts/userContext';
 
 // Icon
 import ball from '../../images/icons/volleyball.svg';

@@ -2,7 +2,8 @@ import React, { useEffect } from "react";
 import { authProvider as API } from "../API/api";
 
 // Context
-import { useAuth } from '../userContext';
+import { useTitle } from "../contexts/titleContext";
+import { useAuth } from '../contexts/userContext';
 
 // Components
 import LoginBox from "./LoginBox";
@@ -13,6 +14,12 @@ import courtImage from '../images/court.jpg';
 
 const Header = () => {
     const [ user, setUser ] = useAuth();
+    const [ title, setTitle ] = useTitle();
+
+    useEffect(() => {
+        setTitle('Portale Osservatori');
+    }, [setTitle]);
+
     useEffect(() => {
         if (!user) {
             API.verifyLogin()

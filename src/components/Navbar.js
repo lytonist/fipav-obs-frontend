@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { removeToken } from '../lib/storageUtils';
 
 // Context
-import { useAuth } from "../userContext";
+import { useAuth } from "../contexts/userContext";
 
 const Navbar = () => {
     const [hiddenState, setHiddenState] = useState(true);
