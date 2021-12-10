@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { setToken } from "../lib/storageUtils";
 
 // Context
 import { useAuth } from "../contexts/userContext";
@@ -77,13 +76,7 @@ const LoginBox = () => {
         setError(undefined);
         try {
             const body = JSON.stringify({username, password});
-            const response = await API.signin(body);
-            if (response.success) {
-                setUser(response.user);
-                setToken(response.token.token);
-            } else {
-                setError(response.msg || 'Qualcosa non va');
-            }
+            await API.signin(body, setUser, setError);
          } catch (error) {
             setError('Qualcosa è andato storto');
         }

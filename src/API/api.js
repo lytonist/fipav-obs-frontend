@@ -1,15 +1,43 @@
 import decode from 'jwt-decode';
-import { getToken, removeToken } from '../lib/storageUtils';
+import { getToken, removeToken, setToken } from '../lib/storageUtils';
+
+// Main Variables
+import mainConfigs from '../configs/main';
+const { PATH, PROTOCOL } = mainConfigs;
+
+// Common Fetch
+async function fetchData(endpoint, method, body = undefined, requireAuth = false) {
+    const url = `${PROTOCOL}://${PATH}/${endpoint}`;
+    const options = {
+        method: method,
+        headers: { 'Content-Type': 'application/json' }
+    }
+    body && (options.body = body);
+    requireAuth && (options.headers['Authorization'] = getToken());
+    return await (await fetch(url, options)).json();
+}
 
 const authProvider = {
-    signin: async (body) => {
-        const url = 'http://localhost:3001/api/v1/login';
-        const options = {
-            method: 'POST',
-            body: body,
-            headers: { 'Content-Type': 'application/json' }
-        };
-        return await (await fetch(url, options)).json();
+    
+    signin: async (body, setUser, setError) => {
+        fetchData('login', 'POST', body)
+            .then(response => {
+                if (response.success) {
+                    setUser(response.user);
+                    setToken(response.token.token);
+                } else {
+                    setError(response.msg || 'Qualcosa non va');
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                setError('Qualcosa è andato storto');
+            });
+    },
+
+    signout: (setUser) => {
+        removeToken();
+        setUser(undefined);
     },
 
     verifyLogin: async () => {
@@ -22,15 +50,7 @@ const authProvider = {
         }
         if (token && Date.now() / 1000 < decoded.exp) { // il token è ancora valido
             console.log('token valido');
-            const url = 'http://localhost:3001/api/v1/protected';
-            const options = {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': token
-                }
-            }
-            return await (await fetch(url, options)).json();
+            return await fetchData('protected', 'GET', undefined, true);
         }
         return false;
     }
