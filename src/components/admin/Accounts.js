@@ -1,14 +1,42 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
+
+// Api
+import { serviceProvider as API } from "../../API/api";
 
 // Context
 import { useTitle } from "../../contexts/titleContext";
 
+// Components
+import UserList from "./accounts/UserList";
+import UserModal from "./accounts/UserModal";
+
 const Accounts = () => {
     const [ title, setTitle ] = useTitle();
+    const [ users, setUsers ] = useState([]);
+    const [ newUserModal, setNewUserModal ] = useState(true);
 
     useEffect(() => {
         setTitle('Gestione Accounts');
     }, [setTitle]);
+
+    useEffect(() => {
+        API.get('users', true)
+            .then(res => {
+                res.success && setUsers(res.users);
+            });
+    }, []);
+
+    function toggleUserModal() {
+        setNewUserModal(!newUserModal);
+        if (!newUserModal) {
+            document.querySelector('[modal-backdrop]').remove();
+        } else {
+            const backdropEl = document.createElement('div');
+            backdropEl.setAttribute('modal-backdrop', '');
+            backdropEl.classList.add('bg-gray-900', 'bg-opacity-50', 'fixed', 'inset-0', 'z-40');
+            document.querySelector('body').append(backdropEl);
+        }
+    }
 
     return (
         <main className="container mx-auto px-5 py-20 lg:px-10 md:py-48">
@@ -16,7 +44,7 @@ const Accounts = () => {
             <div className="flex flex-col">
                 <div className="overflow-x-auto sm:-mx-6 lg:-mx-8">
                     <div className="py-2 inline-block min-w-full sm:px-6 lg:px-8">
-                        <div className="overflow-hidden sm:rounded-lg shadow-md">
+                        <div className="overflow-hidden sm:rounded-lg shadow-md mb-2">
                             <table className="min-w-full">
                                 <thead className="bg-gray-50 dark:bg-gray-700">
                                     <tr>
@@ -26,78 +54,25 @@ const Accounts = () => {
                                         <th scope="col" className="text-xs font-medium text-gray-700 px-6 py-3 text-left uppercase tracking-wider dark:text-gray-400">
                                             Ruolo
                                         </th>
-                                        <th scope="col" className="text-xs font-medium text-gray-700 px-6 py-3 text-left uppercase tracking-wider dark:text-gray-400">
-                                            Category
-                                        </th>
-                                        <th scope="col" className="text-xs font-medium text-gray-700 px-6 py-3 text-left uppercase tracking-wider dark:text-gray-400">
-                                            Price
-                                        </th>
                                         <th scope="col" className="relative px-6 py-3">
                                             <span className="sr-only">Edit</span>
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    {/* <!-- Product 1 --> */}
-                                    <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
-                                            Apple MacBook Pro 17"
-                                        </td>
-                                        <td className="text-sm text-gray-500 px-6 py-4 whitespace-nowrap dark:text-gray-400">
-                                            Sliver
-                                        </td>
-                                        <td className="text-sm text-gray-500 px-6 py-4 whitespace-nowrap dark:text-gray-400">
-                                            Laptop
-                                        </td>
-                                        <td className="text-sm text-gray-500 px-6 py-4 whitespace-nowrap dark:text-gray-400">
-                                            $2999
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            <a href="#" className="text-blue-600 hover:text-blue-900 dark:text-blue-500 dark:hover:underline">Edit</a>
-                                        </td>
-                                    </tr>
-                                    {/* <!-- Product 2 --> */}
-                                    <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
-                                            Apple Imac 27"
-                                        </td>
-                                        <td className="text-sm text-gray-500 px-6 py-4 whitespace-nowrap dark:text-gray-400">
-                                            White
-                                        </td>
-                                        <td className="text-sm text-gray-500 px-6 py-4 whitespace-nowrap dark:text-gray-400">
-                                            Desktop Pc
-                                        </td>
-                                        <td className="text-sm text-gray-500 px-6 py-4 whitespace-nowrap dark:text-gray-400">
-                                            $1999
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            <a href="#" className="text-blue-600 hover:text-blue-900 dark:text-blue-500 dark:hover:underline">Edit</a>
-                                        </td>
-                                    </tr>
-                                    {/* <!-- Product 2 --> */}
-                                    <tr className="bg-white dark:bg-gray-800">
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
-                                            Apple Magic Mouse 2
-                                        </td>
-                                        <td className="text-sm text-gray-500 px-6 py-4 whitespace-nowrap dark:text-gray-400">
-                                            White
-                                        </td>
-                                        <td className="text-sm text-gray-500 px-6 py-4 whitespace-nowrap dark:text-gray-400">
-                                            Accessories
-                                        </td>
-                                        <td className="text-sm text-gray-500 px-6 py-4 whitespace-nowrap dark:text-gray-400">
-                                            $99
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            <a href="#" className="text-blue-600 hover:text-blue-900 dark:text-blue-500 dark:hover:underline">Edit</a>
-                                        </td>
-                                    </tr>
-                                </tbody>
+                                <UserList users={users} />
                             </table>
                         </div>
+                        <button
+                            type="button"
+                            className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 mb-3 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                            onClick={toggleUserModal}
+                        >
+                            Nuovo Utente
+                        </button>
                     </div>
                 </div>
             </div>
+            <UserModal newUserModal={newUserModal} toggleUserModal={toggleUserModal} />
         </main>
     )
 }
