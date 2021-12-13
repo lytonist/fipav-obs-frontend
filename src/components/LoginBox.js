@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { useAuth } from "../contexts/userContext";
 
 // Api
-import { authProvider as API } from '../API/api';
+import { authProvider as AUTH } from '../API/api';
 
 const LoginBox = () => {
     const icons = [{
@@ -76,7 +76,7 @@ const LoginBox = () => {
         setError(undefined);
         try {
             const body = JSON.stringify({username, password});
-            await API.signin(body, setUser, setError);
+            await AUTH.signin(body, setUser, setError);
          } catch (error) {
             setError('Qualcosa è andato storto');
         }

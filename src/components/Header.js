@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { authProvider as API } from "../API/api";
+import { authProvider as AUTH } from "../API/api";
 
 // Context
 import { useTitle } from "../contexts/titleContext";
@@ -22,7 +22,7 @@ const Header = () => {
 
     useEffect(() => {
         if (!user) {
-            API.verifyLogin()
+            AUTH.verifyLogin()
                 .then(response => {
                     response && setUser (response.user);
                 })

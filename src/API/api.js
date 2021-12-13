@@ -18,7 +18,7 @@ async function fetchData(endpoint, method, body = undefined, requireAuth = false
 }
 
 const authProvider = {
-    
+
     signin: async (body, setUser, setError) => {
         fetchData('login', 'POST', body)
             .then(response => {
@@ -56,4 +56,15 @@ const authProvider = {
     }
 };
 
-export { authProvider };
+const serviceProvider = {
+
+    get: async (endpoint, requireAuth = false) => {
+        return await fetchData(endpoint, 'GET', undefined, requireAuth);
+    },
+
+    insert: async (endpoint, data, requireAuth) => {
+        return await fetchData(endpoint, 'POST', data, requireAuth);
+    }
+}
+
+export { authProvider, serviceProvider };

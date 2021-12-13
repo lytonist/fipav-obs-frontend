@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { authProvider as API } from '../API/api';
+import { authProvider as AUTH } from '../API/api';
 
 // Context
 import { useAuth } from "../contexts/userContext";
@@ -19,7 +19,7 @@ const Navbar = () => {
     }
 
     const logout = () => {
-        API.signout(setUser);
+        AUTH.signout(setUser);
     }
 
     const privateMenu = (
