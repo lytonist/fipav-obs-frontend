@@ -1,9 +1,30 @@
-import React from "react";
+import React, { useState } from "react";
 
 const UserModal = ({ newUserModal, toggleUserModal }) => {
+    const [ username, setUsername ] = useState();
+    const [ password, setPassword ] = useState();
+    const [ name, setName ] = useState();
+    const [ lastname, setLastname ] = useState();
+    const [ email, setEmail ] = useState();
+    const [ admin, setAdmin ] = useState(false);
+
+    const handleInput = e => {
+        const name = e.currentTarget.name;
+        const value = e.currentTarget.value;
+        name === 'username' && setUsername(value);
+        name === 'password' && setPassword(value);
+        name === 'name' && setName(value);
+        name === 'lastname' && setLastname(value);
+        name === 'email' && setEmail(value);
+    }
+
+    const handleCheckbox = () => {
+        setAdmin(!admin);
+    }
+
     return (
         <div aria-hidden={newUserModal ? 'true' : 'false'} aria-modal={newUserModal ? 'false' : true} className={`overflow-x-hidden overflow-y-auto fixed h-modal md:h-full top-4 left-0 right-0 md:inset-0 z-50 justify-center items-center ${newUserModal ? 'hidden' : 'flex'}`}>
-            <div className="relative w-full max-w-md px-4 h-full md:h-auto">
+            <div className="relative w-full max-w-lg px-4 h-full md:h-auto">
                 { /* Modal content */ }
                 <div className="bg-white rounded-lg shadow relative dark:bg-gray-700">
                     <div className="flex justify-end p-2">
@@ -12,30 +33,84 @@ const UserModal = ({ newUserModal, toggleUserModal }) => {
                         </button>
                     </div>
                     <form className="space-y-6 px-6 lg:px-8 pb-4 sm:pb-6 xl:pb-8" action="#">
-                        <h3 className="text-xl font-medium text-gray-900 dark:text-white">Sign in to our platform</h3>
-                        <div>
-                            <label htmlFor="email" className="text-sm font-medium text-gray-900 block mb-2 dark:text-gray-300">Your email</label>
-                            <input type="email" name="email" id="email" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" placeholder="name@company.com" required />
+                        <h3 className="text-xl font-medium text-gray-900 text-center dark:text-white">Nuovo Utente</h3>
+                        <div className="flex space-x-2 justify-between">
+                            <div>
+                                <label htmlFor="username" className="text-sm font-medium text-gray-900 block mb-2 dark:text-gray-300">Username</label>
+                                <input
+                                    type="text" 
+                                    name="username" 
+                                    id="username" 
+                                    value={ username } 
+                                    onChange={ handleInput }
+                                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" required 
+                                />
+                            </div>
+                            <div>
+                                <label htmlFor="password" className="text-sm font-medium text-gray-900 block mb-2 dark:text-gray-300">Password</label>
+                                <input 
+                                    type="password" 
+                                    name="password" 
+                                    id="password" 
+                                    placeholder="••••••••" 
+                                    value={ password }
+                                    onChange={ handleInput }
+                                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" required 
+                                />
+                            </div>
+                        </div>
+                        <div className="flex space-x-2 justify-between">
+                            <div>
+                                <label htmlFor="name" className="text-sm font-medium text-gray-900 block mb-2 dark:text-gray-300">Nome</label>
+                                <input 
+                                    type="text" 
+                                    name="name" 
+                                    id="name" 
+                                    value={ name }
+                                    onChange={ handleInput }
+                                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" required
+                                />
+                            </div>
+                            <div>
+                                <label htmlFor="lastname" className="text-sm font-medium text-gray-900 block mb-2 dark:text-gray-300">Cognome</label>
+                                <input 
+                                    type="text" 
+                                    name="lastname" 
+                                    id="lastname" 
+                                    value={ lastname }
+                                    onChange={ handleInput }
+                                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" required
+                                />
+                            </div>
                         </div>
                         <div>
-                            <label htmlFor="password" className="text-sm font-medium text-gray-900 block mb-2 dark:text-gray-300">Your password</label>
-                            <input type="password" name="password" id="password" placeholder="••••••••" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" required />
+                            <label htmlFor="email" className="text-sm font-medium text-gray-900 block mb-2 dark:text-gray-300">Email</label>
+                            <input 
+                                type="email" 
+                                name="email" 
+                                id="email" 
+                                value={ email }
+                                onChange={ handleInput }
+                                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" placeholder="nome@mail.com" required
+                            />
                         </div>
                         <div className="flex justify-between">
                             <div className="flex items-start">
                                 <div className="flex items-center h-5">
-                                    <input id="remember" aria-describedby="remember" type="checkbox" className="bg-gray-50 border border-gray-300 focus:ring-3 focus:ring-blue-300 h-4 w-4 rounded dark:bg-gray-600 dark:border-gray-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800" required />
+                                    <input 
+                                        id="admin" 
+                                        aria-describedby="admin" 
+                                        type="checkbox" 
+                                        checked={ admin }
+                                        onChange={ handleCheckbox }
+                                        className="bg-gray-50 border border-gray-300 focus:ring-3 focus:ring-blue-300 h-4 w-4 rounded dark:bg-gray-600 dark:border-gray-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800" required />
                                 </div>
                                 <div className="text-sm ml-3">
-                                <label htmlFor="remember" className="font-medium text-gray-900 dark:text-gray-300">Remember me</label>
+                                <label htmlFor="admin" className="font-medium text-gray-900 dark:text-gray-300">Admin</label>
                                 </div>
                             </div>
-                            <a href="#" className="text-sm text-blue-700 hover:underline dark:text-blue-500">Lost Password?</a>
                         </div>
-                        <button type="submit" className="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Login to your account</button>
-                        <div className="text-sm font-medium text-gray-500 dark:text-gray-300">
-                            Not registered? <a href="#" className="text-blue-700 hover:underline dark:text-blue-500">Create account</a>
-                        </div>
+                        <button type="submit" className="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Crea Utente</button>
                     </form>
                 </div>
             </div>
