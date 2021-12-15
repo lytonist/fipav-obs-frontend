@@ -14,6 +14,14 @@ const Accounts = () => {
     const [ title, setTitle ] = useTitle();
     const [ users, setUsers ] = useState([]);
     const [ newUserModal, setNewUserModal ] = useState(true);
+    const [user, setUser] = useState({
+        username: '',
+        password: '',
+        name: '',
+        lastname: '',
+        email: '',
+        admin: false
+    });
 
     useEffect(() => {
         setTitle('Gestione Accounts');
@@ -38,6 +46,18 @@ const Accounts = () => {
         }
     }
 
+    function newUser() {
+        setUser({
+            username: '',
+            password: '',
+            name: '',
+            lastname: '',
+            email: '',
+            admin: false
+        });
+        toggleUserModal();
+    }
+
     return (
         <main className="container mx-auto px-5 py-20 lg:px-10 md:py-48">
             Accounts Page
@@ -59,20 +79,20 @@ const Accounts = () => {
                                         </th>
                                     </tr>
                                 </thead>
-                                <UserList users={users} />
+                                <UserList users={users} setUser={setUser} toggleUserModal={toggleUserModal} />
                             </table>
                         </div>
                         <button
                             type="button"
                             className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 mb-3 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                            onClick={toggleUserModal}
+                            onClick={newUser}
                         >
                             Nuovo Utente
                         </button>
                     </div>
                 </div>
             </div>
-            <UserModal newUserModal={newUserModal} toggleUserModal={toggleUserModal} />
+            <UserModal newUserModal={newUserModal} toggleUserModal={toggleUserModal} user={user} setUser={setUser} />
         </main>
     )
 }

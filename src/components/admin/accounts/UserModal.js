@@ -1,25 +1,22 @@
-import React, { useState } from "react";
+import React from "react";
 
-const UserModal = ({ newUserModal, toggleUserModal }) => {
-    const [ username, setUsername ] = useState();
-    const [ password, setPassword ] = useState();
-    const [ name, setName ] = useState();
-    const [ lastname, setLastname ] = useState();
-    const [ email, setEmail ] = useState();
-    const [ admin, setAdmin ] = useState(false);
+const UserModal = ({ newUserModal, toggleUserModal, user, setUser }) => {
+    const { username, password, name, lastname, email, admin } = user;
+    
 
     const handleInput = e => {
-        const name = e.currentTarget.name;
-        const value = e.currentTarget.value;
-        name === 'username' && setUsername(value);
-        name === 'password' && setPassword(value);
-        name === 'name' && setName(value);
-        name === 'lastname' && setLastname(value);
-        name === 'email' && setEmail(value);
+        const { name, value } = e.currentTarget;
+        setUser(prevState => ({
+            ...prevState,
+            [name]: value
+        }));
     }
 
     const handleCheckbox = () => {
-        setAdmin(!admin);
+        setUser(prevState => ({
+            ...prevState,
+            admin: !user.admin
+        }));
     }
 
     return (
@@ -33,14 +30,13 @@ const UserModal = ({ newUserModal, toggleUserModal }) => {
                         </button>
                     </div>
                     <form className="space-y-6 px-6 lg:px-8 pb-4 sm:pb-6 xl:pb-8" action="#">
-                        <h3 className="text-xl font-medium text-gray-900 text-center dark:text-white">Nuovo Utente</h3>
+                        <h3 className="text-xl font-medium text-gray-900 text-center dark:text-white">{username ? 'Modifica' : 'Nuovo'} Utente</h3>
                         <div className="flex space-x-2 justify-between">
                             <div>
                                 <label htmlFor="username" className="text-sm font-medium text-gray-900 block mb-2 dark:text-gray-300">Username</label>
                                 <input
                                     type="text" 
-                                    name="username" 
-                                    id="username" 
+                                    name="username"
                                     value={ username } 
                                     onChange={ handleInput }
                                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" required 
@@ -51,7 +47,6 @@ const UserModal = ({ newUserModal, toggleUserModal }) => {
                                 <input 
                                     type="password" 
                                     name="password" 
-                                    id="password" 
                                     placeholder="••••••••" 
                                     value={ password }
                                     onChange={ handleInput }
@@ -65,7 +60,6 @@ const UserModal = ({ newUserModal, toggleUserModal }) => {
                                 <input 
                                     type="text" 
                                     name="name" 
-                                    id="name" 
                                     value={ name }
                                     onChange={ handleInput }
                                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" required
@@ -76,7 +70,6 @@ const UserModal = ({ newUserModal, toggleUserModal }) => {
                                 <input 
                                     type="text" 
                                     name="lastname" 
-                                    id="lastname" 
                                     value={ lastname }
                                     onChange={ handleInput }
                                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" required
@@ -88,7 +81,6 @@ const UserModal = ({ newUserModal, toggleUserModal }) => {
                             <input 
                                 type="email" 
                                 name="email" 
-                                id="email" 
                                 value={ email }
                                 onChange={ handleInput }
                                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" placeholder="nome@mail.com" required
@@ -98,7 +90,6 @@ const UserModal = ({ newUserModal, toggleUserModal }) => {
                             <div className="flex items-start">
                                 <div className="flex items-center h-5">
                                     <input 
-                                        id="admin" 
                                         aria-describedby="admin" 
                                         type="checkbox" 
                                         checked={ admin }
