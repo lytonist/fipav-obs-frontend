@@ -2,9 +2,10 @@ import React from "react";
 
 // Context
 
-const UserRow = ({ setUser, user, toggleUserModal }) => {
+const UserRow = ({ setModalState, setUser, user, toggleUserModal }) => {
 
     const editUser = () => {
+        setModalState('edit');
         setUser({
             ...user,
             password: ''
@@ -27,7 +28,7 @@ const UserRow = ({ setUser, user, toggleUserModal }) => {
                 <button
                     type="button"
                     onClick={editUser}
-                    className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-1 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                    className="btn-edit py-1 dark:bg-yellow-600 dark:hover:bg-yellow-700 dark:focus:ring-yellow-800"
                 >
                     Modifica
                 </button>
@@ -36,9 +37,9 @@ const UserRow = ({ setUser, user, toggleUserModal }) => {
     )
 };
 
-const UserList = ({ users, setUser, toggleUserModal }) => {
+const UserList = ({ users, setModalState, setUser, toggleUserModal }) => {
     const listUsers = users.map(user => 
-        <UserRow key={user._id} user={user} setUser={setUser} toggleUserModal={toggleUserModal} />
+        <UserRow key={user._id} user={user} setModalState={setModalState} setUser={setUser} toggleUserModal={toggleUserModal} />
     )
 
     return (

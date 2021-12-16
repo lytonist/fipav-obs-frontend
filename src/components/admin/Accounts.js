@@ -13,6 +13,7 @@ import UserModal from "./accounts/UserModal";
 const Accounts = () => {
     const [ title, setTitle ] = useTitle();
     const [ users, setUsers ] = useState([]);
+    const [ modalState, setModalState ] = useState('new');
     const [ newUserModal, setNewUserModal ] = useState(true);
     const [user, setUser] = useState({
         username: '',
@@ -47,6 +48,7 @@ const Accounts = () => {
     }
 
     function newUser() {
+        setModalState('new');
         setUser({
             username: '',
             password: '',
@@ -81,12 +83,12 @@ const Accounts = () => {
                                         </th>
                                     </tr>
                                 </thead>
-                                <UserList users={users} setUser={setUser} toggleUserModal={toggleUserModal} />
+                                <UserList users={users} setModalState={setModalState} setUser={setUser} toggleUserModal={toggleUserModal} />
                             </table>
                         </div>
                         <button
                             type="button"
-                            className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 mb-3 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                            className="btn-default dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                             onClick={newUser}
                         >
                             Nuovo Utente
@@ -94,7 +96,7 @@ const Accounts = () => {
                     </div>
                 </div>
             </div>
-            <UserModal newUserModal={newUserModal} toggleUserModal={toggleUserModal} user={user} setUser={setUser} />
+            <UserModal newUserModal={newUserModal} toggleUserModal={toggleUserModal} modalState={modalState} user={user} setUser={setUser} setUsers={setUsers} />
         </main>
     )
 }

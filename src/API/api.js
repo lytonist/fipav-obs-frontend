@@ -9,12 +9,17 @@ const { PATH, PROTOCOL } = mainConfigs;
 async function fetchData(endpoint, method, body = undefined, requireAuth = false) {
     const url = `${PROTOCOL}://${PATH}/${endpoint}`;
     const options = {
+        mode: 'cors',
         method: method,
         headers: { 'Content-Type': 'application/json' }
     }
     body && (options.body = body);
     requireAuth && (options.headers['Authorization'] = getToken());
-    return await (await fetch(url, options)).json();
+    try {
+        return await (await fetch(url, options)).json();
+    } catch(err) {
+        return {success: false, msg: 'Qualcosa è andato storto'}
+    }
 }
 
 const authProvider = {
@@ -26,7 +31,7 @@ const authProvider = {
                     setUser(response.user);
                     setToken(response.token.token);
                 } else {
-                    setError(response.msg || 'Qualcosa non va');
+                    setError(response.msg || 'Qualcosa è andato storto');
                 }
             })
             .catch(err => {
@@ -44,12 +49,10 @@ const authProvider = {
         const token = getToken();
         const decoded = token ? decode(token) : undefined;
         if (token && Date.now() / 1000 > decoded.exp) { // il token è scaduto
-            console.log('token scaduto');
             removeToken();
             return false;
         }
         if (token && Date.now() / 1000 < decoded.exp) { // il token è ancora valido
-            console.log('token valido');
             return await fetchData('protected', 'GET', undefined, true);
         }
         return false;
