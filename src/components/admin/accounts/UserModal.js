@@ -1,7 +1,7 @@
 import React from "react";
 
 const UserModal = ({ newUserModal, toggleUserModal, user, setUser }) => {
-    const { username, password, name, lastname, email, admin } = user;
+    const { username, password, firstname, lastname, email, admin } = user;
     
 
     const handleInput = e => {
@@ -43,24 +43,35 @@ const UserModal = ({ newUserModal, toggleUserModal, user, setUser }) => {
                                 />
                             </div>
                             <div>
-                                <label htmlFor="password" className="text-sm font-medium text-gray-900 block mb-2 dark:text-gray-300">Password</label>
-                                <input 
-                                    type="password" 
-                                    name="password" 
-                                    placeholder="••••••••" 
-                                    value={ password }
-                                    onChange={ handleInput }
-                                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" required 
-                                />
+                                { username ? 
+                                (
+                                    <button 
+                                        type="button"
+                                        className="w-full text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm mt-8 px-4 py-1 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-red-800">Reset Password
+                                    </button>
+                                )
+                                : (
+                                    <>
+                                        <label htmlFor="password" className="text-sm font-medium text-gray-900 block mb-2 dark:text-gray-300">Password</label>
+                                        <input 
+                                            type="password" 
+                                            name="password" 
+                                            placeholder="••••••••" 
+                                            value={ password }
+                                            onChange={ handleInput }
+                                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" required 
+                                        />
+                                    </>
+                                ) }
                             </div>
                         </div>
                         <div className="flex space-x-2 justify-between">
                             <div>
-                                <label htmlFor="name" className="text-sm font-medium text-gray-900 block mb-2 dark:text-gray-300">Nome</label>
+                                <label htmlFor="firstname" className="text-sm font-medium text-gray-900 block mb-2 dark:text-gray-300">Nome</label>
                                 <input 
                                     type="text" 
-                                    name="name" 
-                                    value={ name }
+                                    name="firstname" 
+                                    value={ firstname }
                                     onChange={ handleInput }
                                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" required
                                 />

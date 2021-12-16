@@ -17,7 +17,7 @@ const Accounts = () => {
     const [user, setUser] = useState({
         username: '',
         password: '',
-        name: '',
+        firstname: '',
         lastname: '',
         email: '',
         admin: false
@@ -50,7 +50,7 @@ const Accounts = () => {
         setUser({
             username: '',
             password: '',
-            name: '',
+            firstname: '',
             lastname: '',
             email: '',
             admin: false
@@ -59,8 +59,7 @@ const Accounts = () => {
     }
 
     return (
-        <main className="container mx-auto px-5 py-20 lg:px-10 md:py-48">
-            Accounts Page
+        <main className="container mx-auto h-screen px-5 py-20 lg:px-10 md:py-48">
             <div className="flex flex-col">
                 <div className="overflow-x-auto sm:-mx-6 lg:-mx-8">
                     <div className="py-2 inline-block min-w-full sm:px-6 lg:px-8">
@@ -70,6 +69,9 @@ const Accounts = () => {
                                     <tr>
                                         <th scope="col" className="text-xs font-medium text-gray-700 px-6 py-3 text-left uppercase tracking-wider dark:text-gray-400">
                                             Nome
+                                        </th>
+                                        <th scope="col" className="text-xs hidden md:inline-block font-medium text-gray-700 px-6 py-3 text-left uppercase tracking-wider dark:text-gray-400">
+                                            E-Mail
                                         </th>
                                         <th scope="col" className="text-xs font-medium text-gray-700 px-6 py-3 text-left uppercase tracking-wider dark:text-gray-400">
                                             Ruolo
