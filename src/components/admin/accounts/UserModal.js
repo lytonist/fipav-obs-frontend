@@ -27,14 +27,13 @@ const UserModal = ({ modalState, newUserModal, toggleUserModal, user, setUser, s
 
     const newUser = e => {
         e.preventDefault();
-        if (username && password && firstname && lastname && email) {
-            API.insert('register', JSON.stringify(user), true)
+            API.insert('users', JSON.stringify(user), true)
             .then(res => {
                 if (res?.success) {
                     setUsers(prevState => [...prevState, res.user]
                         .sort((a, b) => {
-                            if (a.firstname.toUpperCase() > b.firstname.toUpperCase()) return 1;
-                            if (a.firstname.toUpperCase() < b.firstname.toUpperCase()) return -1;
+                            if (a.lastname.toUpperCase() > b.lastname.toUpperCase()) return 1;
+                            if (a.lastname.toUpperCase() < b.lastname.toUpperCase()) return -1;
                             return 0;
                         })
                         .sort((a, b) => {
@@ -43,15 +42,47 @@ const UserModal = ({ modalState, newUserModal, toggleUserModal, user, setUser, s
                             return 0;
                         })
                     );
-                    toggleUserModal();
+                    closeModal();
                 } else {
-                    setError(res.msg || 'Qualcosa è andato storto');
+                    setError(res.msg || 'Qualcosa è andato storto, si prega di riprovare');
                 }
+            })
+            .catch(err => {
+                console.error(err);
+                setError('Qualcosa è andato storto, si prega di riprovare');
             });
-        } else {
-            setError('Si prega di compilare tutti i campi');
-        }
     };
+
+    const editUser = e => {
+        e.preventDefault();
+        API.update(`users/${user._id}`, JSON.stringify(user), true)
+            .then(res => {
+                if (res?.success) {
+                    setUsers(prevState => {
+                        const index = prevState.findIndex(u => u._id === user._id);
+                        prevState[index] = user;
+                        return prevState
+                            .sort((a, b) => {
+                                if (a.lastname.toUpperCase() > b.lastname.toUpperCase()) return 1;
+                                if (a.lastname.toUpperCase() < b.lastname.toUpperCase()) return -1;
+                                return 0;
+                            })
+                            .sort((a, b) => {
+                                if (!admin && b.admin) return 1;
+                                if (a.admin && !b.admin) return -1;
+                                return 0;
+                            });
+                    });
+                    closeModal();
+                } else {
+                    setError(res.msg || 'Qualcosa è andato storto, si prega di riprovare');
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                setError('Qualcosa è andato storto, si prega di riprovare');
+            });
+    }
 
     return (
         <div aria-hidden={newUserModal ? 'true' : 'false'} aria-modal={newUserModal ? 'false' : true} className={`overflow-x-hidden overflow-y-auto fixed h-modal md:h-full top-4 left-0 right-0 md:inset-0 z-50 justify-center items-center ${newUserModal ? 'hidden' : 'flex'}`}>
@@ -83,7 +114,7 @@ const UserModal = ({ modalState, newUserModal, toggleUserModal, user, setUser, s
                                 (
                                     <button 
                                         type="button"
-                                        className="btn-delete mt-7 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800">Reset Password
+                                        className="btn-edit mt-7 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800">Reset Password
                                     </button>
                                 )
                                 : (
@@ -157,8 +188,8 @@ const UserModal = ({ modalState, newUserModal, toggleUserModal, user, setUser, s
                         <div>
                             <button 
                                 type="submit" 
-                                className="w-full btn-default dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                                onClick={ newUser }
+                                className={`w-full ${ modalState === 'edit' ? 'btn-edit' : 'btn-default' } mr-3 mb-3 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800`}
+                                onClick={ modalState === 'edit' ? editUser : newUser }
                             >
                                 { modalState === 'edit' ? 'Modifica' : 'Crea'} Utente
                             </button>

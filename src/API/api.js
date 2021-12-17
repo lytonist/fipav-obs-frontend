@@ -65,8 +65,12 @@ const serviceProvider = {
         return await fetchData(endpoint, 'GET', undefined, requireAuth);
     },
 
-    insert: async (endpoint, data, requireAuth) => {
+    insert: async (endpoint, data, requireAuth = false) => {
         return await fetchData(endpoint, 'POST', data, requireAuth);
+    },
+
+    update: async (endpoint, data, requireAuth = false) => {
+        return await fetchData(endpoint, 'PUT', data, requireAuth);
     }
 }
 

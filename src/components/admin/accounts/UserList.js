@@ -6,10 +6,7 @@ const UserRow = ({ setModalState, setUser, user, toggleUserModal }) => {
 
     const editUser = () => {
         setModalState('edit');
-        setUser({
-            ...user,
-            password: ''
-        }); // Set Password here because those properties are not set in users, or will have a warning defined to undefined
+        setUser(user);
         toggleUserModal();
     }
 
