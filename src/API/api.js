@@ -70,7 +70,11 @@ const serviceProvider = {
     },
 
     update: async (endpoint, data, requireAuth = false) => {
-        return await fetchData(endpoint, 'PUT', data, requireAuth);
+        return await fetchData(endpoint, 'PATCH', data, requireAuth);
+    },
+    
+    delete: async (endpoint, requireAuth = false) => {
+        return await fetchData(endpoint, 'DELETE', undefined, requireAuth);
     }
 }
 

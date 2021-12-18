@@ -44,7 +44,7 @@ const UserModal = ({ modalState, newUserModal, toggleUserModal, user, setUser, s
                     );
                     closeModal();
                 } else {
-                    setError(res.msg || 'Qualcosa è andato storto, si prega di riprovare');
+                    setError(res?.msg || 'Qualcosa è andato storto, si prega di riprovare');
                 }
             })
             .catch(err => {
@@ -75,7 +75,41 @@ const UserModal = ({ modalState, newUserModal, toggleUserModal, user, setUser, s
                     });
                     closeModal();
                 } else {
-                    setError(res.msg || 'Qualcosa è andato storto, si prega di riprovare');
+                    setError(res?.msg || 'Qualcosa è andato storto, si prega di riprovare');
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                setError('Qualcosa è andato storto, si prega di riprovare');
+            });
+    }
+
+    const deleteUser = e => {
+        e.preventDefault();
+        API.delete(`users/${user._id}`, true)
+            .then(res => {
+                if (res?.success) {
+                    setUsers(prevState => prevState.filter(u => u._id !== user._id));
+                    closeModal();
+                } else {
+                    setError(res?.msg || 'Qualcosa è andato storto, si prega di riprovare');
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                setError('Qualcosa è andato storto, si prega di riprovare');
+            });
+    }
+
+    const resetPassword = e => {
+        e.preventDefault();
+        const body = JSON.stringify({ password: 'reset' });
+        API.update(`users/${user._id}`, body, true)
+            .then(res => {
+                if (res?.success) {
+                    closeModal();
+                } else {
+                    setError(res?.msg || 'Qualcosa è andato storto, si prega di riprovare');
                 }
             })
             .catch(err => {
@@ -114,7 +148,10 @@ const UserModal = ({ modalState, newUserModal, toggleUserModal, user, setUser, s
                                 (
                                     <button 
                                         type="button"
-                                        className="btn-edit mt-7 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800">Reset Password
+                                        onClick={ resetPassword }
+                                        className="btn-edit mt-7 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800"
+                                    >
+                                        Reset Password
                                     </button>
                                 )
                                 : (
@@ -194,7 +231,12 @@ const UserModal = ({ modalState, newUserModal, toggleUserModal, user, setUser, s
                                 { modalState === 'edit' ? 'Modifica' : 'Crea'} Utente
                             </button>
                             { modalState === 'edit' && (
-                                <button className="w-full btn-delete">Elimina Utente</button>
+                                <button 
+                                    className="w-full btn-delete"
+                                    onClick={ deleteUser }
+                                >
+                                    Elimina Utente
+                                </button>
                             )}
                         </div>
                     </form>
