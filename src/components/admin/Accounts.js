@@ -83,6 +83,13 @@ const Accounts = () => {
                                         </th>
                                     </tr>
                                 </thead>
+                                { !users.length &&
+                                    (<tbody>
+                                        <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                                            <td className="table-td font-medium text-gray-900 text-center dark:text-white" colSpan="4">Nessun utente ancora inserito</td>
+                                        </tr>
+                                    </tbody>)
+                                }
                                 <UserList users={users} setModalState={setModalState} setUser={setUser} toggleUserModal={toggleUserModal} />
                             </table>
                         </div>

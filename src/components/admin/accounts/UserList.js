@@ -1,7 +1,5 @@
 import React from "react";
 
-// Context
-
 const UserRow = ({ setModalState, setUser, user, toggleUserModal }) => {
 
     const editUser = () => {
@@ -31,19 +29,19 @@ const UserRow = ({ setModalState, setUser, user, toggleUserModal }) => {
                 </button>
             </td>
         </tr>
-    )
+    );
 };
 
 const UserList = ({ users, setModalState, setUser, toggleUserModal }) => {
     const listUsers = users.map(user => 
         <UserRow key={user._id} user={user} setModalState={setModalState} setUser={setUser} toggleUserModal={toggleUserModal} />
-    )
+    );
 
     return (
         <tbody>
             { listUsers }
         </tbody>
-    )
+    );
 };
 
 export default UserList;

@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
+import { serviceProvider as API } from '../../API/api';
 
 // Context
 import { useTitle } from '../../contexts/titleContext';
 
 // Components
+import RefList from './referees/RefList';
 import RefModal from './referees/RefModal';
 
 const Referees = () => {
@@ -21,8 +23,20 @@ const Referees = () => {
         setTitle('Gestione Arbitri');
     }, [setTitle]);
 
+    useEffect(() => {
+        API.get('referees', true)
+            .then(res => {
+                res.success && setReferees(res.referees);
+            });
+    }, []);
+
     function newReferee() {
         setModalType('new');
+        setReferee({
+            firstname: '',
+            lastname: '',
+            email: ''
+        });
         toggleRefModal();
     }
 
@@ -68,6 +82,12 @@ const Referees = () => {
                                         </tr>
                                     </tbody>)
                                 }
+                                <RefList 
+                                    referees={referees}
+                                    setModalType={setModalType}
+                                    setReferee={setReferee}
+                                    toggleRefModal={toggleRefModal}
+                                />
                             </table>
                         </div>
                         <button
@@ -80,7 +100,7 @@ const Referees = () => {
                     </div>
                 </div>
             </div>
-            <RefModal modal={modal} modalType={modalType} referee={referee} setReferee={setReferee} toggleRefModal={toggleRefModal} />
+            <RefModal modal={modal} modalType={modalType} referee={referee} setReferee={setReferee} setReferees={setReferees} toggleRefModal={toggleRefModal} />
         </main>
     );
 

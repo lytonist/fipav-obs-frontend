@@ -1,6 +1,7 @@
 import React, { useState } from "react";
+import { serviceProvider as API } from "../../../API/api";
 
-const RefModal = ({ modal, modalType, referee, setReferee, toggleRefModal }) => {
+const RefModal = ({ modal, modalType, referee, setReferee, setReferees, toggleRefModal }) => {
     const { firstname, lastname, email } = referee;
     const [ error, setError ] = useState('');
 
@@ -16,6 +17,72 @@ const RefModal = ({ modal, modalType, referee, setReferee, toggleRefModal }) => 
             [name]: value
         }));
     };
+
+    function newReferee(e) {
+        e.preventDefault();
+        API.insert('referees', JSON.stringify(referee), true)
+            .then(res => {
+                if (res?.success) {
+                    setReferees(prevState => [...prevState, res.referee]
+                        .sort((a, b) => {
+                            if (a.lastname.toUpperCase() > b.lastname.toUpperCase()) return 1;
+                            if (a.lastname.toUpperCase() < b.lastname.toUpperCase()) return -1;
+                            return 0;
+                        })
+                    );
+                    closeModal();
+                } else {
+                    setError(res?.msg || 'Qualcosa è andato storto, si prega di riprovare');
+                }
+            })
+            .catch (err => {
+                console.error(err);
+                setError('Qualcosa è andato storto, si prega di riprovare');
+            });
+    }
+
+    function editReferee(e) {
+        e.preventDefault();
+        API.update(`referees/${referee._id}`, JSON.stringify(referee), true)
+            .then(res => {
+                if (res?.success) {
+                    setReferees(prevState => {
+                        const index = prevState.findIndex(r => r._id === referee._id);
+                        prevState[index] = referee;
+                        return prevState
+                            .sort((a, b) => {
+                                if (a.lastname.toUpperCase() > b.lastname.toUpperCase()) return 1;
+                                if (a.lastname.toUpperCase() < b.lastname.toUpperCase()) return -1;
+                                return 0;
+                            });
+                    });
+                    closeModal();
+                } else {
+                    setError(res?.msg || 'Qualcosa è andato storto, si prega di riprovare');
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                setError('Qualcosa è andato storto, si prega di riprovare');
+            });
+    }
+
+    function deleteReferee(e) {
+        e.preventDefault();
+        API.delete(`referees/${referee._id}`, true)
+            .then(res => {
+                if (res?.success) {
+                    setReferees(prevState => prevState.filter(r => r._id !== referee._id));
+                    closeModal();
+                } else {
+                    setError(res?.msg || 'Qualcosa è andato storto, si prega di riprovare');
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                setError('Qualcosa è andato storto, si prega di riprovare');
+            });
+    }
 
     return (
         <div aria-hidden={modal ? 'false' : 'true'} aria-modal={modal ? 'true' : 'false'} className={`overflow-x-hidden overflow-y-auto fixed h-modal md:h-full top-4 left-0 right-0 md:inset-0 z-50 justify-center items-center ${modal ? 'flex' : 'hidden'}`}>
@@ -69,14 +136,14 @@ const RefModal = ({ modal, modalType, referee, setReferee, toggleRefModal }) => 
                             <button 
                                 type="submit" 
                                 className={`w-full ${ modalType === 'edit' ? 'btn-edit' : 'btn-default' } mr-3 mb-3 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800`}
-                                
+                                onClick={ modalType === 'edit' ? editReferee : newReferee }
                             >
                                 { modalType === 'edit' ? 'Modifica' : 'Crea'} Arbitro
                             </button>
                             { modalType === 'edit' && (
                                 <button 
                                     className="w-full btn-delete"
-                                    
+                                    onClick={ deleteReferee }
                                 >
                                     Elimina Arbitro
                                 </button>
