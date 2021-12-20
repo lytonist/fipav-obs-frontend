@@ -243,7 +243,7 @@ const UserModal = ({ modalState, newUserModal, toggleUserModal, user, setUser, s
                 </div>
             </div>
         </div> 
-    )
+    );
 };
 
 export default UserModal;

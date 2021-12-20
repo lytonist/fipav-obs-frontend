@@ -1,43 +1,34 @@
-import React, { useEffect, useState } from "react";
-
-// Api
-import { serviceProvider as API } from "../../API/api";
+import React, { useEffect, useState } from 'react';
 
 // Context
-import { useTitle } from "../../contexts/titleContext";
+import { useTitle } from '../../contexts/titleContext';
 
 // Components
-import UserList from "./accounts/UserList";
-import UserModal from "./accounts/UserModal";
+import RefModal from './referees/RefModal';
 
-const Accounts = () => {
+const Referees = () => {
     const [ title, setTitle ] = useTitle();
-    const [ users, setUsers ] = useState([]);
-    const [ modalState, setModalState ] = useState('new');
-    const [ newUserModal, setNewUserModal ] = useState(true);
-    const [user, setUser] = useState({
-        username: '',
-        password: '',
+    const [ modal, setModal ] = useState(false);
+    const [ modalType, setModalType ] = useState('new');
+    const [ referees, setReferees ] = useState([]);
+    const [ referee, setReferee ]  = useState({
         firstname: '',
         lastname: '',
-        email: '',
-        admin: false
+        email: ''
     });
 
     useEffect(() => {
-        setTitle('Gestione Accounts');
+        setTitle('Gestione Arbitri');
     }, [setTitle]);
 
-    useEffect(() => {
-        API.get('users', true)
-            .then(res => {
-                res.success && setUsers(res.users);
-            });
-    }, []);
+    function newReferee() {
+        setModalType('new');
+        toggleRefModal();
+    }
 
-    function toggleUserModal() {
-        setNewUserModal(!newUserModal);
-        if (!newUserModal) {
+    function toggleRefModal() {
+        setModal(!modal);
+        if (modal) {
             document.querySelector('[modal-backdrop]').remove();
         } else {
             const backdropEl = document.createElement('div');
@@ -45,19 +36,6 @@ const Accounts = () => {
             backdropEl.classList.add('bg-gray-900', 'bg-opacity-50', 'fixed', 'inset-0', 'z-40');
             document.querySelector('body').append(backdropEl);
         }
-    }
-
-    function newUser() {
-        setModalState('new');
-        setUser({
-            username: '',
-            password: '',
-            firstname: '',
-            lastname: '',
-            email: '',
-            admin: false
-        });
-        toggleUserModal();
     }
 
     return (
@@ -70,35 +48,42 @@ const Accounts = () => {
                                 <thead className="bg-gray-50 dark:bg-gray-700">
                                     <tr>
                                         <th scope="col" className="table-th text-gray-700 dark:text-gray-400">
-                                            Nome
-                                        </th>
-                                        <th scope="col" className="table-th hidden md:inline-block dark:text-gray-400">
-                                            E-Mail 
+                                            Cognome
                                         </th>
                                         <th scope="col" className="table-th text-gray-700 dark:text-gray-400">
-                                            Ruolo
+                                            Nome
+                                        </th>
+                                        <th scope="col" className="table-th text-gray-700 dark:text-gray-400">
+                                            E-Mail
                                         </th>
                                         <th scope="col" className="relative px-6 py-3">
                                             <span className="sr-only">Edit</span>
                                         </th>
                                     </tr>
                                 </thead>
-                                <UserList users={users} setModalState={setModalState} setUser={setUser} toggleUserModal={toggleUserModal} />
+                                { !referees.length &&
+                                    (<tbody>
+                                        <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                                            <td className="table-td font-medium text-gray-900 text-center dark:text-white" colSpan="4">Nessun arbitro ancora inserito</td>
+                                        </tr>
+                                    </tbody>)
+                                }
                             </table>
                         </div>
                         <button
                             type="button"
                             className="btn-default dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                            onClick={newUser}
+                            onClick={ newReferee }
                         >
-                            Nuovo Utente
+                            Nuovo Arbitro
                         </button>
                     </div>
                 </div>
             </div>
-            <UserModal newUserModal={newUserModal} toggleUserModal={toggleUserModal} modalState={modalState} user={user} setUser={setUser} setUsers={setUsers} />
+            <RefModal modal={modal} modalType={modalType} referee={referee} setReferee={setReferee} toggleRefModal={toggleRefModal} />
         </main>
     );
+
 }
 
-export default Accounts;
+export default Referees;

@@ -6,9 +6,9 @@ import { authProvider as AUTH } from '../API/api';
 import { useAuth } from "../contexts/userContext";
 
 const Navbar = () => {
-    const [hiddenState, setHiddenState] = useState(true);
+    const [ hiddenState, setHiddenState ] = useState(true);
     const [ user, setUser ] = useAuth();
-
+    
     const toggleHiddenState = () => {
         const elementsToHide = document.querySelectorAll('.hide-element');
         setHiddenState(!hiddenState);
@@ -22,21 +22,26 @@ const Navbar = () => {
         AUTH.signout(setUser);
     }
 
-    const privateMenu = (
+    const adminMenu = (
         <>
             <Link to="/accounts" className="hover:bg-blue-400 border-b border-gray-100 md:hover:bg-transparent md:border-0 block pl-3 pr-4 py-2 md:hover:text-blue-700 md:p-0">
                 <li className="rounded text-gray-200 hover:text-gray-900 bg-blue-500 hover:bg-blue-600 p-2">
                     Accounts
                 </li>
             </Link>
-            <Link to="/nuovo-report" className="hover:bg-blue-400 border-b border-gray-100 md:hover:bg-transparent md:border-0 block pl-3 pr-4 py-2 md:hover:text-blue-700 md:p-0">
+            <Link to="/arbitri" className="hover:bg-blue-400 border-b border-gray-100 md:hover:bg-transparent md:border-0 block pl-3 pr-4 py-2 md:hover:text-blue-700 md:p-0">
                 <li className="rounded text-gray-200 hover:text-gray-900 bg-blue-500 hover:bg-blue-600 p-2">
-                    Nuovo Report
+                    Arbitri
                 </li>
             </Link>
-            <Link to="/report-precedenti" className="hover:bg-blue-400 border-b border-gray-100 md:hover:bg-transparent md:border-0 block pl-3 pr-4 py-2 md:hover:text-blue-700 md:p-0">
+        </>
+    );
+
+    const userMenu = (
+        <>
+            <Link to="/report" className="hover:bg-blue-400 border-b border-gray-100 md:hover:bg-transparent md:border-0 block pl-3 pr-4 py-2 md:hover:text-blue-700 md:p-0">
                 <li className="rounded bg-blue-500 hover:bg-blue-600 text-gray-200 hover:text-gray-900 p-2">
-                    Report Precedenti
+                    Report
                 </li>
             </Link>
             <button 
@@ -48,7 +53,7 @@ const Navbar = () => {
                 </li>
             </button>
         </>
-    );
+    )
 
     return (
         <>
@@ -66,7 +71,8 @@ const Navbar = () => {
                     </button>
                     <div className="hidden md:block w-full md:w-auto text-center hide-element" id="mobile-menu">
                         <ul className="flex-col md:flex-row flex md:space-x-4 mt-4 md:mt-0 md:text-sm md:font-medium">
-                            { user && privateMenu }
+                            { user?.admin && adminMenu }
+                            { user && userMenu }
                         </ul>
                     </div>
                 </div>

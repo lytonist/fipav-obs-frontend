@@ -6,6 +6,7 @@ import Accounts   from './components/admin/Accounts';
 import Footer     from './components/Footer';
 import Header     from './components/Header';
 import Navbar     from './components/Navbar';
+import Referees   from './components/admin/Referees';
 import Title      from './components/Title';
 
 // Auth Components
@@ -47,10 +48,19 @@ function Main() {
           <Route
             path="/accounts"
             element={ 
-              <RequireUser>
+              <RequireAdmin>
                 <Accounts />
-              </RequireUser> 
+              </RequireAdmin> 
             } />
+          <Route
+            path="/arbitri"
+            element={
+              <RequireAdmin>
+                <Referees />
+              </RequireAdmin>
+            }
+          >
+          </Route>
         </Routes>
       </div>
       <Footer />

@@ -12,16 +12,16 @@ const UserRow = ({ setModalState, setUser, user, toggleUserModal }) => {
 
     return (
         <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+            <td className="table-td font-medium text-gray-900 dark:text-white">
                 { user.lastname } { user.firstname }
             </td>
-            <td className="text-sm hidden md:inline-block text-gray-500 px-6 py-4 whitespace-nowrap dark:text-gray-400">
+            <td className="table-td hidden md:inline-block text-gray-500 dark:text-gray-400">
                 { user.email }
             </td>
-            <td className="text-sm text-gray-500 px-6 py-4 whitespace-nowrap dark:text-gray-400">
+            <td className="table-td text-gray-500 dark:text-gray-400">
                 { user.admin ? 'Admin' : 'User' }
             </td>
-            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+            <td className="table-td text-right font-medium">
                 <button
                     type="button"
                     onClick={editUser}
