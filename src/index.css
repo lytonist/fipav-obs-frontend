@@ -39,6 +39,11 @@ h1, h2, h3, h4, h5, h6 {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Headings */
+.generic-title {
+  @apply uppercase;
+}
+
 /* Buttons */
 .btn-default {
   @apply text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm py-2 px-3 text-center;
@@ -59,4 +64,21 @@ h1, h2, h3, h4, h5, h6 {
 
 .table-td {
   @apply text-sm px-6 py-4 whitespace-nowrap;
+}
+
+/* Forms */
+.form-input {
+  @apply text-gray-900 bg-gray-50 rounded-lg border border-gray-300 sm:text-xs focus:ring-blue-500 focus:border-blue-500;
+}
+
+.form-input-disabled {
+  @apply bg-gray-200 border border-gray-300 sm:text-xs text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 cursor-not-allowed;
+}
+
+.form-select {
+  @apply bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg sm:text-xs focus:ring-blue-500 focus:border-blue-500 block w-full;
+}
+
+.form-label {
+  @apply block mb-2 text-sm font-medium text-gray-900;
 }

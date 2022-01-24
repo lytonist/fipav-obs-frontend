@@ -13,7 +13,7 @@ const UserRow = ({ setModalState, setUser, user, toggleUserModal }) => {
             <td className="table-td font-medium text-gray-900 dark:text-white">
                 { user.lastname } { user.firstname }
             </td>
-            <td className="table-td hidden md:inline-block text-gray-500 dark:text-gray-400">
+            <td className="table-td hidden md:table-cell text-gray-500 dark:text-gray-400">
                 { user.email }
             </td>
             <td className="table-td text-gray-500 dark:text-gray-400">

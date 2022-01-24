@@ -67,7 +67,7 @@ const Referees = () => {
                                         <th scope="col" className="table-th text-gray-700 dark:text-gray-400">
                                             Nome
                                         </th>
-                                        <th scope="col" className="table-th text-gray-700 dark:text-gray-400">
+                                        <th scope="col" className="table-th hidden md:table-cell text-gray-700 dark:text-gray-400">
                                             E-Mail
                                         </th>
                                         <th scope="col" className="relative px-6 py-3">

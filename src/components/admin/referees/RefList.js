@@ -15,7 +15,7 @@ const RefRow = ({ referee, setModalType, setReferee, toggleRefModal }) => {
             <td className="table-td font-medium text-gray-900 dark:text-white">
                 { referee.firstname }
             </td>
-            <td className="table-td hidden md:inline-block text-gray-500 dark:text-gray-400">
+            <td className="table-td hidden md:table-cell text-gray-500 dark:text-gray-400">
                 { referee.email }
             </td>
             <td className="table-td text-right font-medium">

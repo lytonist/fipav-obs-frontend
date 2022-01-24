@@ -1,7 +1,7 @@
 module.exports = {
-  purge: [
-    './src/**/*.html',
-    './src/**/*.js',
+  content: [
+    './src/**/*.{js,jsx,ts,tsx}',
+    "./node_modules/@themesberg/flowbite/**/*.js"
   ],
   darkMode: false, // or 'media' or 'class'
   theme: {
@@ -12,5 +12,10 @@ module.exports = {
   },
   plugins: [
     require('@themesberg/flowbite/plugin')
-],
+  ],
 }
+
+// purge: [
+//  './src/**/*.html',
+//  './src/**/*.js',
+// ],

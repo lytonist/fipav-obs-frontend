@@ -7,6 +7,7 @@ import Footer     from './components/Footer';
 import Header     from './components/Header';
 import Navbar     from './components/Navbar';
 import Referees   from './components/admin/Referees';
+import Reports    from './components/user/Reports';
 import Title      from './components/Title';
 
 // Auth Components
@@ -16,8 +17,7 @@ import { RequireAdmin, RequireUser } from './requireAuth';
 import TitleProvider, { useTitle } from './contexts/titleContext';
 import UserProvider from './contexts/userContext';
 
-// Style
-import '@themesberg/flowbite'; // Not sure if it works
+
 
 function App() {
 
@@ -38,20 +38,22 @@ function Main() {
     <div className="App">
       <Navbar />
       <Title title={title} />
-      <div className="bg-gradient-to-r from-blue-500 to-blue-400">
+      <div className="bg-gradient-to-r from-gray-300 to-gray-100">
         <Routes>
           <Route
             path="/"
             element={ 
               <Header /> 
-            } />
+            }
+          />
           <Route
             path="/accounts"
             element={ 
               <RequireAdmin>
                 <Accounts />
               </RequireAdmin> 
-            } />
+            }
+          />
           <Route
             path="/arbitri"
             element={
@@ -59,8 +61,15 @@ function Main() {
                 <Referees />
               </RequireAdmin>
             }
-          >
-          </Route>
+          />
+          <Route
+            path="/report"
+            element={
+              <RequireUser>
+                <Reports />
+              </RequireUser>
+            }
+          />
         </Routes>
       </div>
       <Footer />

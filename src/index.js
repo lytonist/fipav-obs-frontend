@@ -6,6 +6,9 @@ import App from './App';
 
 import reportWebVitals from './reportWebVitals';
 
+// Style
+import '@themesberg/flowbite'; // Not sure if it works
+
 ReactDOM.render(
   <React.StrictMode>
       <App />
