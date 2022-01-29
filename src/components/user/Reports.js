@@ -18,7 +18,7 @@ function Reports() {
         <main className="container mx-auto px-5 py-20 lg:px-10 md:py-48">
             <button className="btn-default mb-4">Nuovo Report</button>
             <ReportForm />
-            <ReportTable />
+            {/* <ReportTable /> */}
         </main>
     )
 }
