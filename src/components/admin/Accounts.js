@@ -21,6 +21,8 @@ const Accounts = () => {
         firstname: '',
         lastname: '',
         email: '',
+        committee: 'ak',
+        role: 'reg',
         admin: false
     });
 
@@ -55,6 +57,8 @@ const Accounts = () => {
             firstname: '',
             lastname: '',
             email: '',
+            committee: 'ak',
+            role: 'reg',
             admin: false
         });
         toggleUserModal();
@@ -76,7 +80,7 @@ const Accounts = () => {
                                             E-Mail 
                                         </th>
                                         <th scope="col" className="table-th text-gray-700 dark:text-gray-400">
-                                            Ruolo
+                                            Accesso
                                         </th>
                                         <th scope="col" className="relative px-6 py-3">
                                             <span className="sr-only">Edit</span>

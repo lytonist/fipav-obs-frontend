@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { serviceProvider as API } from "../../../API/api";
 
 const RefModal = ({ modal, modalType, referee, setReferee, setReferees, toggleRefModal }) => {
-    const { firstname, lastname, email } = referee;
+    const { firstname, lastname, committee, email } = referee;
     const [ error, setError ] = useState('');
 
     function closeModal() {
@@ -121,16 +121,35 @@ const RefModal = ({ modal, modalType, referee, setReferee, setReferees, toggleRe
                                 />
                             </div>
                         </div>
-                        <div>
-                            <label htmlFor="email" className="text-sm font-medium text-gray-900 block mb-2 dark:text-gray-300">Email</label>
-                            <input 
-                                type="email" 
-                                name="email" 
-                                value={ email }
-                                onChange={ handleInput }
-                                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" placeholder="nome@mail.com" 
-                                required
-                            />
+                        <div className="flex space-x-2 justify-between">
+                            <div>
+                                <label htmlFor="committee" className="text-sm font-medium text-gray-900 block mb-2 dark:text-gray-300">Comitato</label>
+                                <select 
+                                    name="committee" 
+                                    value={ committee }
+                                    onChange={ handleInput }
+                                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-40 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
+                                    required
+                                >
+                                    <option value="ak">Akranis</option>
+                                    <option value="ct">Catania</option>
+                                    <option value="me">Messina</option>
+                                    <option value="mi">Monti Iblei</option>
+                                    <option value="pa">Palermo</option>
+                                    <option value="tp">Trapani</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label htmlFor="email" className="text-sm font-medium text-gray-900 block mb-2 dark:text-gray-300">Email</label>
+                                <input 
+                                    type="email" 
+                                    name="email" 
+                                    value={ email }
+                                    onChange={ handleInput }
+                                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" placeholder="nome@mail.com" 
+                                    required
+                                />
+                            </div>
                         </div>
                         <div>
                             <button 

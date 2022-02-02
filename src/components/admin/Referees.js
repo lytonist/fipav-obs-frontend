@@ -16,6 +16,7 @@ const Referees = () => {
     const [ referee, setReferee ]  = useState({
         firstname: '',
         lastname: '',
+        committee: 'ak',
         email: ''
     });
 
@@ -35,6 +36,7 @@ const Referees = () => {
         setReferee({
             firstname: '',
             lastname: '',
+            committee: 'ak',
             email: ''
         });
         toggleRefModal();
