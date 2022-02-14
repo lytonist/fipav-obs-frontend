@@ -1,6 +1,10 @@
 import React from 'react';
 
-function ReportTable() {
+function ReportRow({ report }) {
+
+}
+
+function ReportTable({ reports }) {
 
     return (
         <div className="flex flex-col">
@@ -11,16 +15,16 @@ function ReportTable() {
                             <thead className="bg-gray-50 dark:bg-gray-700">
                                 <tr>
                                     <th scope="col" className="py-3 px-6 text-xs font-medium tracking-wider text-left text-gray-700 uppercase dark:text-gray-400">
-                                        Name
+                                        Data
                                     </th>
                                     <th scope="col" className="py-3 px-6 text-xs font-medium tracking-wider text-left text-gray-700 uppercase dark:text-gray-400">
-                                        Color
+                                        Gara n.
                                     </th>
                                     <th scope="col" className="py-3 px-6 text-xs font-medium tracking-wider text-left text-gray-700 uppercase dark:text-gray-400">
-                                        Category
+                                        Squadre
                                     </th>
                                     <th scope="col" className="py-3 px-6 text-xs font-medium tracking-wider text-left text-gray-700 uppercase dark:text-gray-400">
-                                        Price
+                                        Arbitri
                                     </th>
                                     <th scope="col" className="relative py-3 px-6">
                                         <span className="sr-only">Edit</span>
@@ -28,7 +32,18 @@ function ReportTable() {
                                 </tr>
                             </thead>
                             <tbody>
-
+                                {
+                                    !reports.length && (
+                                        <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                                            <td 
+                                                className="py-4 px-6 text-sm text-gray-500 whitespace-nowrap text-center dark:text-gray-400" 
+                                                colSpan="5"
+                                            >
+                                                Nessun report da visualizzare
+                                            </td>
+                                        </tr>
+                                    )
+                                }
                                 <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
                                     <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                         Apple MacBook Pro 17"

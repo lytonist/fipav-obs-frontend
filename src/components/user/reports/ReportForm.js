@@ -4,6 +4,150 @@ import { serviceProvider as API } from "../../../API/api";
 // Context
 import { useAuth } from "../../../contexts/userContext";
 
+//
+//* Validating Inputs *//
+//
+import validateInput from "../../../lib/validateUtils";
+
+const checks = [
+    // General
+    { field: 'match_num', tests: ['notEmpty'] },
+    { field: 'series', tests: ['notEmpty'] },
+    { field: 'date', tests: ['notEmpty'] },
+    { field: 'time', tests: ['notEmpty', 'isTime'] },
+    { field: 'real_time', tests: ['notEmpty', 'isTime'] },
+    { field: 'teams', tests: ['notEmpty'] },
+    { field: 'first_ref', tests: ['notEmpty'] },
+    { field: 'second_ref', tests: ['allowEmpty'] },
+    { field: 'scorer', tests: ['notEmpty'] },
+    // Match
+    { field: 'result', tests: ['notEmpty', 'isValidResult'] },
+    { field: 'duration', tests: ['notEmpty', 'isNumber'] },
+    { field: 'spects', tests: ['notEmpty', 'isNumber'] },
+    { field: 'pts1set', tests: ['notEmpty', 'standardSet'] },
+    { field: 'pts2set', tests: ['notEmpty', 'standardSet']},
+    { field: 'pts3set', tests: ['notEmpty', 'standardSet'] },
+    { field: 'pts4set', tests: ['allowEmpty', 'standardSet'] },
+    { field: 'pts5set', tests: ['allowEmpty', 'standardSet'] },
+    { field: 'pts6set', tests: ['allowEmpty', 'standardSet'] },
+    { field: 'dur1set', tests: ['notEmpty', 'isNumber'] },
+    { field: 'dur2set', tests: ['notEmpty', 'isNumber'] },
+    { field: 'dur3set', tests: ['notEmpty', 'isNumber'] },
+    { field: 'dur4set', tests: ['allowEmpty', 'isNumber'] },
+    { field: 'dur5set', tests: ['allowEmpty', 'isNumber'] },
+    { field: 'dur6set', tests: ['allowEmpty', 'isNumber'] },
+    // Image
+    { field: 'aspect1ref', tests: ['notEmpty'] },
+    { field: 'aspect2ref', tests: ['notEmpty'] },
+    { field: 'delay1ref', tests: ['notEmpty'] },
+    { field: 'delay2ref', tests: ['notEmpty'] },
+    { field: 'prot1ref', tests: ['notEmpty'] },
+    { field: 'prot2ref', tests: ['notEmpty'] },
+    { field: 'whistle1ref', tests: ['notEmpty'] },
+    { field: 'whistle2ref', tests: ['notEmpty'] },
+    { field: 'complaint1ref', tests: ['notEmpty'] },
+    { field: 'complaint2ref', tests: ['notEmpty'] },
+    { field: 'image_notes', tests: ['allowEmpty', 'maxLength'] },
+    // Technical
+    { field: 'complexity', tests: ['notEmpty'] },
+    { field: 'tech1ref', tests: ['notEmpty'] },
+    { field: 'tech2ref', tests: ['notEmpty'] },
+    { field: 'ballsinout_ord_1ref', tests: ['notEmpty', 'isNumber'] },
+    { field: 'ballsinout_ord_2ref', tests: ['notEmpty', 'isNumber'] },
+    { field: 'ballsinout_sev_1ref', tests: ['notEmpty', 'isNumber'] },
+    { field: 'ballsinout_sev_2ref', tests: ['notEmpty', 'isNumber'] },
+    { field: 'balltouches_ord_1ref', tests: ['notEmpty', 'isNumber'] },
+    { field: 'balltouches_sev_1ref', tests: ['notEmpty', 'isNumber'] },
+    { field: 'firsttouch_ord_1ref', tests: ['notEmpty', 'isNumber'] },
+    { field: 'firsttouch_sev_1ref', tests: ['notEmpty', 'isNumber'] },
+    { field: 'penetration_ord_1ref', tests: ['notEmpty', 'isNumber'] },
+    { field: 'penetration_ord_2ref', tests: ['notEmpty', 'isNumber'] },
+    { field: 'penetration_sev_1ref', tests: ['notEmpty', 'isNumber'] },
+    { field: 'penetration_sev_2ref', tests: ['notEmpty', 'isNumber'] },
+    { field: 'posfaults_ord_1ref', tests: ['notEmpty', 'isNumber'] },
+    { field: 'posfaults_ord_2ref', tests: ['notEmpty', 'isNumber'] },
+    { field: 'posfaults_sev_1ref', tests: ['notEmpty', 'isNumber'] },
+    { field: 'posfaults_sev_2ref', tests: ['notEmpty', 'isNumber'] },
+    { field: 'nettouches_ord_1ref', tests: ['notEmpty', 'isNumber'] },
+    { field: 'nettouches_ord_2ref', tests: ['notEmpty', 'isNumber'] },
+    { field: 'nettouches_sev_1ref', tests: ['notEmpty', 'isNumber'] },
+    { field: 'nettouches_sev_2ref', tests: ['notEmpty', 'isNumber'] },
+    { field: 'walltouches_ord_1ref', tests: ['notEmpty', 'isNumber'] },
+    { field: 'walltouches_ord_2ref', tests: ['notEmpty', 'isNumber'] },
+    { field: 'walltouches_sev_1ref', tests: ['notEmpty', 'isNumber'] },
+    { field: 'walltouches_sev_2ref', tests: ['notEmpty', 'isNumber'] },
+    { field: 'airplay_ord_1ref', tests: ['notEmpty', 'isNumber'] },
+    { field: 'airplay_sev_1ref', tests: ['notEmpty', 'isNumber'] },
+    { field: 'defensefaults_ord_1ref', tests: ['notEmpty', 'isNumber'] },
+    { field: 'defensefaults_ord_2ref', tests: ['notEmpty', 'isNumber'] },
+    { field: 'defensefaults_sev_1ref', tests: ['notEmpty', 'isNumber'] },
+    { field: 'defensefaults_sev_2ref', tests: ['notEmpty', 'isNumber'] },
+    { field: 'servefaults_ord_1ref', tests: ['notEmpty', 'isNumber'] },
+    { field: 'servefaults_sev_1ref', tests: ['notEmpty', 'isNumber'] },
+    { field: 'liberofaults_ord_1ref', tests: ['notEmpty', 'isNumber'] },
+    { field: 'liberofaults_ord_2ref', tests: ['notEmpty', 'isNumber'] },
+    { field: 'liberofaults_sev_1ref', tests: ['notEmpty', 'isNumber'] },
+    { field: 'liberofaults_sev_2ref', tests: ['notEmpty', 'isNumber'] },
+    { field: 'otherfaults_ord_1ref', tests: ['notEmpty', 'isNumber'] },
+    { field: 'otherfaults_ord_2ref', tests: ['notEmpty', 'isNumber'] },
+    { field: 'otherfaults_sev_1ref', tests: ['notEmpty', 'isNumber'] },
+    { field: 'otherfaults_sev_2ref', tests: ['notEmpty', 'isNumber'] },
+    { field: 'error_notes', tests: ['allowEmpty', 'maxLength'] },
+    { field: 'collab1ref', tests: ['notEmpty'] },
+    { field: 'collab2ref', tests: ['notEmpty'] },
+    { field: 'collab_notes', tests: ['allowEmpty', 'maxLength'] },
+    // Relational
+    { field: 'gest_difficulty', tests: ['notEmpty'] },
+    { field: 'gest1ref', tests: ['notEmpty'] },
+    { field: 'gest2ref', tests: ['notEmpty'] },
+    { field: 'conc1ref', tests: ['notEmpty'] },
+    { field: 'conc2ref', tests: ['notEmpty'] },
+    { field: 'rel_notes', tests: ['allowEmpty', 'maxLength'] },
+    // Discipline
+    { field: 'gest_discipline', tests: ['notEmpty'] },
+    { field: 'd_verbals', tests: ['notEmpty', 'isNumber'] },
+    { field: 'd_officials', tests: ['notEmpty', 'isNumber'] },
+    { field: 'd_penals', tests: ['notEmpty', 'isNumber'] },
+    { field: 'd_expulsions', tests: ['notEmpty', 'isNumber'] },
+    { field: 'd_squalifications', tests: ['notEmpty', 'isNumber'] },
+    { field: 'discipline', tests: ['notEmpty'] },
+    { field: 'disc_interation', tests: ['notEmpty'] },
+    { field: 'delays1ref', tests: ['notEmpty'] },
+    { field: 'delays2ref', tests: ['notEmpty'] },
+    { field: 'disc_notes', tests: ['allowEmpty', 'maxLength'] },
+    // Interview
+    { field: 'interview1ref', tests: ['notEmpty'] },
+    { field: 'interview2ref', tests: ['notEmpty'] },
+    { field: 'interview_notes', tests: ['allowEmpty', 'maxLength'] },
+    // Events
+    { field: 'finalvote1ref', tests: ['notEmpty'] },
+    { field: 'finalvote2ref', tests: ['notEmpty'] }
+];
+
+function checkInput(e) {
+    const inputId = e.currentTarget.id;
+    const value = e.currentTarget.value;
+    const { tests } = checks.find(el => el.field === inputId);
+    return validateInput(value, tests);
+}
+
+function confirmBlur(test, inputId, setError, setStyle) {
+    if (test.success) {
+        setError(undefined);
+        setStyle(prevState => ({
+            ...prevState,
+            [inputId]: 'form-input-success'
+        }));
+    } else {
+        setError(test.msg);
+        setStyle(prevState => ({
+            ...prevState,
+            [inputId]: 'form-input-danger'
+        }));
+    }
+}
+
+// Controlled Inputs
 function manageInput (e, sector, setReport) {
     const { id, value } = e.currentTarget;
     setReport(prevState => ({
@@ -15,12 +159,16 @@ function manageInput (e, sector, setReport) {
     }));
 }
 
-const ThreeOptions = ({ id, value, handleChange }) => (
+//
+//* Secondary Components *//
+//
+const ThreeOptions = ({ id, value, handleChange, handleBlur, classList }) => (
     <select 
         id={ id } 
         value={ value }
         onChange={ handleChange } 
-        className="form-select text-sm"
+        onBlur={ handleBlur }
+        className={ classList }
     >
         <option value="2">Positivo</option>
         <option value="1">Parz. Carente</option>
@@ -28,12 +176,13 @@ const ThreeOptions = ({ id, value, handleChange }) => (
     </select>
 )
 
-const FourOptions = ({ id, value, handleChange }) => (
+const FourOptions = ({ id, value, handleChange, handleBlur, classList }) => (
     <select 
         id={ id }
         value={ value }
         onChange={ handleChange } 
-        className="form-select text-sm"
+        onBlur={ handleBlur }
+        className={ classList }
     >
         <option value="3">Ottimo</option>
         <option value="2">Positivo</option>
@@ -42,12 +191,13 @@ const FourOptions = ({ id, value, handleChange }) => (
     </select>
 )
 
-const DifficOptions = ({ id, value, handleChange }) => (
+const DifficOptions = ({ id, value, handleChange, handleBlur, classList }) => (
     <select 
         id={ id }
         value={ value}
         onChange={ handleChange } 
-        className="form-select text-sm"
+        onBlur={ handleBlur }
+        className={ classList }
     >
         <option value="3">Difficile</option>
         <option value="2">Medio-Alta</option>
@@ -56,12 +206,13 @@ const DifficOptions = ({ id, value, handleChange }) => (
     </select>
 )
 
-const FaultSelect = ({ id, value, handleChange }) => (
+const FaultSelect = ({ id, value, handleChange, handleBlur, classList }) => (
     <select 
         id={ id }
         value={ value }
         onChange={ handleChange } 
-        className="form-select text-sm"
+        onBlur={ handleBlur }
+        className={ classList }
     >
         <option value="0">0</option>
         <option value="1">1</option>
@@ -70,148 +221,46 @@ const FaultSelect = ({ id, value, handleChange }) => (
     </select>
 )
 
-const RefereesSelect = ({id, value, handleChange, referees, classList}) => {
+const RefereesSelect = ({id, value, handleChange, handleBlur, referees, classList}) => {
     const options = referees.map(ref =>
-        <option value={ref._id} key={ref._id}>{ref.lastname} {ref.firstname}</option>
+        <option value={ref._id} key={ref._id}>{ref.lastname} {ref.firstname} ({ref.committee.toUpperCase()})</option>
     );
-    return <select id={id} value={value} onChange={handleChange} className={classList}>{options}</select>
-}
-
-const blankReport = {
-    // Dati Generali
-    general: {
-        author: '',
-        match_num: '',
-        series: 'CM',
-        date: '',
-        time: '',
-        real_time: '',
-        teams: '',
-        first_ref: '', // ObjectId
-        second_ref: '', // ObjectId
-        scorer: '',
-    },
-    // Dati Gara
-    match: {
-        result: '0-0',
-        duration: '',
-        spects: '',
-        pts1set: '0-0',
-        pts2set: '0-0',
-        pts3set: '0-0',
-        pts4set: '',
-        pts5set: '',
-        pts6set: '',
-        dur1set: 0,
-        dur2set: 0,
-        dur3set: 0,
-        dur4set: 0,
-        dur5set: 0,
-        dur6set: 0,
-    },
-    // Area Immagine
-    image: {
-        aspect1ref: 2,
-        aspect2ref: 2,
-        delay1ref: 2,
-        delay2ref: 2,
-        prot1ref: 2,
-        prot2ref: 2,
-        whistle1ref: 2,
-        whistle2ref: 2,
-        complaint1ref: 2,
-        complaint2ref: 2,
-        image_notes: '',
-    },
-    // Area Tecnica
-    technical: {
-        complexity: 3,
-        tech1ref: 2,
-        tech2ref: 2,
-        ballsinout_ord_1ref: 0,
-        ballsinout_ord_2ref: 0,
-        ballsinout_sev_1ref: 0,
-        ballsinout_sev_2ref: 0,
-        balltouches_ord_1ref: 0,
-        balltouches_sev_1ref: 0,
-        firsttouch_ord_1ref: 0,
-        firsttouch_sev_1ref: 0,
-        penetration_ord_1ref: 0,
-        penetration_ord_2ref: 0,
-        penetration_sev_1ref: 0,
-        penetration_sev_2ref: 0,
-        posfaults_ord_1ref: 0,
-        posfaults_ord_2ref: 0,
-        posfaults_sev_1ref: 0,
-        posfaults_sev_2ref: 0,
-        nettouches_ord_1ref: 0,
-        nettouches_ord_2ref: 0,
-        nettouches_sev_1ref: 0,
-        nettouches_sev_2ref: 0,
-        walltouches_ord_1ref: 0,
-        walltouches_ord_2ref: 0,
-        walltouches_sev_1ref: 0,
-        walltouches_sev_2ref: 0,
-        airplay_ord_1ref: 0,
-        airplay_sev_1ref: 0,
-        defensefaults_ord_1ref: 0,
-        defensefaults_ord_2ref: 0,
-        defensefaults_sev_1ref: 0,
-        defensefaults_sev_2ref: 0,
-        servefaults_ord_1ref: 0,
-        servefaults_sev_1ref: 0,
-        liberofaults_ord_1ref: 0,
-        liberofaults_ord_2ref: 0,
-        liberofaults_sev_1ref: 0,
-        liberofaults_sev_2ref: 0,
-        otherfaults_ord_1ref: 0,
-        otherfaults_ord_2ref: 0,
-        otherfaults_sev_1ref: 0,
-        otherfaults_sev_2ref: 0,
-        error_notes: '',
-        collab1ref: 2,
-        collab2ref: 2,
-        collab_notes: '',
-    },
-    // Area Relazionale
-    relational: {
-        gest_difficulty: 3,
-        gest1ref: 2,
-        gest2ref: 2,
-        conc1ref: 2,
-        conc2ref: 2,
-        rel_notes: '',
-    },
-    // Area Disciplinare
-    discipline: {
-        gest_difficulty: 3,
-        d_verbals: 0,
-        d_officials: 0,
-        d_penals: 0,
-        d_expulsions: 0,
-        d_squalifications: 0,
-        discipline: 2,
-        disc_interation: 2,
-        delays1ref: 2,
-        delays2ref: 2,
-        disc_notes: '',
-    },
-    // Colloquio
-    interview: {
-        interview1ref: 2,
-        interview2ref: 2,
-        interview_notes: '',
-    },
-    // Eventi particolari
-    events: {
-        finalvote1ref: 3,
-        finalvote2ref: 3
-    }
+    return (
+            <select 
+                id={id} 
+                value={value} 
+                onChange={handleChange}
+                onBlur={handleBlur} 
+                className={classList}
+            >
+                <option value=''>-</option>
+                {options}
+            </select>
+        )
 }
 
 const GeneralArea = ({ report, setReport }) => {
+    const [ error, setError ] = useState();
+    const [ style, setStyle ] = useState({
+        match_num: undefined, 
+        series: undefined, 
+        date: undefined,
+        time: undefined,
+        real_time: undefined,
+        teams: undefined,
+        first_ref: undefined,
+        second_ref: undefined,
+        scorer: undefined
+    });
     const [ referees, setReferees ] = useState([]);
     const [ user ] = useAuth();
+
+    // Validating input
+    function handleBlur(e) {
+        const test = checkInput(e);
+        const inputId = e.currentTarget.id;
+        confirmBlur(test, inputId, setError, setStyle);
+    }
 
     useEffect(() => {
         API.get('referees', true)
@@ -240,7 +289,14 @@ const GeneralArea = ({ report, setReport }) => {
             <div className="mb-4">
                 <h3 className="generic-title">Dati Generali</h3>
             </div>
-            <div className="mb-2 grid grid-cols-3 md:grid-cols-5 gap-4">
+            {
+                error && (
+                    <div className="danger-alert dark:bg-red-200 dark:text-red-800" role="alert">
+                        <span className="font-medium">Attenzione!</span> { error }.
+                    </div>
+                )
+            }
+            <div className="mb-2 grid grid-cols-3 md:grid-cols-5 gap-4 items-center">
                 <div>
                     <label htmlFor="match_num" className="form-label dark:text-gray-300">Gara n.</label>
                     <input 
@@ -248,7 +304,8 @@ const GeneralArea = ({ report, setReport }) => {
                         id="match_num"
                         value={ report.general.match_num } 
                         onChange={ handleChange }
-                        className="block p-2 w-full form-input" 
+                        onBlur={ handleBlur }
+                        className={`block p-2 w-full ${style.match_num || 'form-input'}`} 
                     />
                 </div>
                 <div>
@@ -257,7 +314,8 @@ const GeneralArea = ({ report, setReport }) => {
                         id="series" 
                         value={ report.general.series }
                         onChange={ handleChange }
-                        className="form-select text-sm"
+                        onBlur={ handleBlur }
+                        className={`block p-2 w-full ${style.series || 'form-select'} text-sm`}
                     >
                         <option value="CM">C/M</option>
                         <option value="CF">C/F</option>
@@ -293,11 +351,12 @@ const GeneralArea = ({ report, setReport }) => {
                 <div>
                     <label htmlFor="date" className="form-label dark:text-gray-300">Data</label>
                     <input 
-                        type="text" 
+                        type="date" 
                         id="date" 
                         value={ report.general.date }
                         onChange={ handleChange }
-                        className="block p-2 w-full form-input" 
+                        onBlur={ handleBlur }
+                        className={`block p-2 w-full ${style.date || 'form-input'}`} 
                     />
                 </div>
                 <div>
@@ -305,9 +364,11 @@ const GeneralArea = ({ report, setReport }) => {
                     <input 
                         type="text" 
                         id="time"
+                        placeholder="hh:mm"
                         value={ report.general.time }
                         onChange={ handleChange }
-                        className="block p-2 w-full form-input" 
+                        onBlur={ handleBlur }
+                        className={`block p-2 w-full ${style.time || 'form-input'}`} 
                     />
                 </div>
                 <div>
@@ -315,9 +376,11 @@ const GeneralArea = ({ report, setReport }) => {
                     <input 
                         type="text" 
                         id="real_time"
+                        placeholder="hh:mm"
                         value={ report.general.real_time }
                         onChange={ handleChange } 
-                        className="block p-2 w-full form-input" 
+                        onBlur={ handleBlur }
+                        className={`block p-2 w-full ${style.real_time || 'form-input'}`} 
                     />
                 </div>
             </div>
@@ -329,11 +392,12 @@ const GeneralArea = ({ report, setReport }) => {
                         id="teams"
                         value={ report.general.teams }
                         onChange={ handleChange } 
-                        className="block p-2 w-full form-input" 
+                        onBlur={ handleBlur }
+                        className={`block p-2 w-full ${style.teams || 'form-input'}`} 
                     />
                 </div>
             </div>
-            <div className="mb-2 grid grid-cols-2 md:grid-cols-3 gap-4">
+            <div className="mb-2 grid grid-cols-2 md:grid-cols-3 gap-4 items-center">
                 <div>
                     <label htmlFor="first_ref" className="form-label dark:text-gray-300">Primo Arbitro</label>
                     <RefereesSelect
@@ -341,7 +405,8 @@ const GeneralArea = ({ report, setReport }) => {
                         referees={ referees }
                         value={ report.general.first_ref }
                         handleChange={ handleChange }
-                        classList="block p-2 w-full form-input" 
+                        handleBlur={ handleBlur }
+                        classList={`block p-2 w-full ${style.first_ref || 'form-select'} text-sm`}
                     />
                 </div>
                 <div>
@@ -351,12 +416,20 @@ const GeneralArea = ({ report, setReport }) => {
                         referees={ referees }
                         value={ report.general.second_ref }
                         handleChange={ handleChange }
-                        classList="block p-2 w-full form-input" 
+                        handleBlur={ handleBlur }
+                        classList={`block p-2 w-full ${style.second_ref || 'form-select'} text-sm`}
                     />
                 </div>
                 <div>
                     <label htmlFor="scorer" className="form-label dark:text-gray-300">Segnapunti</label>
-                    <input type="text" id="scorer" className="block p-2 w-full form-input" />
+                    <input 
+                        type="text" 
+                        id="scorer"
+                        value={ report.general.scorer } 
+                        onChange={ handleChange } 
+                        onBlur={ handleBlur }
+                        className={`block p-2 w-full ${style.scorer || 'form-input'}`} 
+                    />
                 </div>
             </div>
         </div>
@@ -364,6 +437,31 @@ const GeneralArea = ({ report, setReport }) => {
 }
 
 const MatchArea = ({ report, setReport }) => {
+    const [error, setError] = useState();
+    const [ style, setStyle ] = useState({
+        result: undefined, 
+        duration: undefined, 
+        spects: undefined,
+        pts1set: undefined,
+        pts2set: undefined,
+        pts3set: undefined,
+        pts4set: undefined,
+        pts5set: undefined,
+        pts6set: undefined,
+        dur1set: undefined,
+        dur2set: undefined,
+        dur3set: undefined,
+        dur4set: undefined,
+        dur5set: undefined,
+        dur6set: undefined,
+    });
+
+    // Validating input
+    function handleBlur(e) {
+        const test = checkInput(e);
+        const inputId = e.currentTarget.id;
+        confirmBlur(test, inputId, setError, setStyle);
+    }
 
     const handleChange = e => {
         manageInput(e, 'match', setReport);
@@ -374,6 +472,13 @@ const MatchArea = ({ report, setReport }) => {
             <div className="mb-4">
                 <h3 className="generic-title">Dati Gara</h3>
             </div>
+            {
+                error && (
+                    <div className="danger-alert dark:bg-red-200 dark:text-red-800" role="alert">
+                        <span className="font-medium">Attenzione!</span> { error }.
+                    </div>
+                )
+            }
             <div className="mb-4 grid grid-cols-3 gap-4">
                 <div>
                     <label htmlFor="result" className="form-label dark:text-gray-300">Risultato</label>
@@ -382,27 +487,30 @@ const MatchArea = ({ report, setReport }) => {
                         id="result"
                         value={ report.match.result }
                         onChange={ handleChange }
-                        className="block p-2 w-full form-input text-sm"
+                        onBlur={ handleBlur }
+                        className={`block p-2 w-full ${style.result || 'form-input'}`}
                     />
                 </div>
                 <div>
                     <label htmlFor="duration" className="form-label dark:text-gray-300">Durata Totale</label>
                     <input 
-                        type="text" 
+                        type="number" 
                         id="duration"
                         value={ report.match.duration }
                         onChange={ handleChange }
-                        className="block p-2 w-full form-input text-sm" 
+                        onBlur={ handleBlur }
+                        className={`block p-2 w-full ${style.duration || 'form-input'}`} 
                     />
                 </div>
                 <div>
                     <label htmlFor="spects" className="form-label dark:text-gray-300">Spettatori</label>
                     <input 
-                        type="text" 
+                        type="number" 
                         id="spects"
                         value={ report.match.spects }
                         onChange={ handleChange } 
-                        className="block p-2 w-full form-input text-sm" 
+                        onBlur={ handleBlur }
+                        className={`block p-2 w-full ${style.spects || 'form-input'}`}
                     />
                 </div>
             </div>
@@ -417,30 +525,51 @@ const MatchArea = ({ report, setReport }) => {
             </div>
             <div className="mb-2 grid grid-cols-7 gap-1 md:gap-4 items-center">
                 <label className="truncate">Punteggio</label>
-                <input type="text" id="pts1set" value={ report.match.pts1set } onChange={ handleChange } className="block p-2 w-full form-input text-sm" />
-                <input type="text" id="pts2set" value={ report.match.pts2set } onChange={ handleChange } className="block p-2 w-full form-input text-sm" />
-                <input type="text" id="pts3set" value={ report.match.pts3set } onChange={ handleChange } className="block p-2 w-full form-input text-sm" />
-                <input type="text" id="pts4set" value={ report.match.pts4set } onChange={ handleChange } className="block p-2 w-full form-input text-sm" />
-                <input type="text" id="pts5set" value={ report.match.pts5set } onChange={ handleChange } className="block p-2 w-full form-input text-sm" />
-                <input type="text" id="pts6set" value={ report.match.pts6set } onChange={ handleChange } className="block p-2 w-full form-input text-sm" />
+                <input type="text" id="pts1set" value={ report.match.pts1set } onChange={ handleChange } onBlur={ handleBlur } className={`block p-2 w-full ${style.pts1set || 'form-input'}`} />
+                <input type="text" id="pts2set" value={ report.match.pts2set } onChange={ handleChange } onBlur={ handleBlur } className={`block p-2 w-full ${style.pts2set || 'form-input'}`} />
+                <input type="text" id="pts3set" value={ report.match.pts3set } onChange={ handleChange } onBlur={ handleBlur } className={`block p-2 w-full ${style.pts3set || 'form-input'}`} />
+                <input type="text" id="pts4set" value={ report.match.pts4set } onChange={ handleChange } onBlur={ handleBlur } className={`block p-2 w-full ${style.pts4set || 'form-input'}`} />
+                <input type="text" id="pts5set" value={ report.match.pts5set } onChange={ handleChange } onBlur={ handleBlur } className={`block p-2 w-full ${style.pts5set || 'form-input'}`} />
+                <input type="text" id="pts6set" value={ report.match.pts6set } onChange={ handleChange } onBlur={ handleBlur } className={`block p-2 w-full ${style.pts6set || 'form-input'}`} />
             </div>
             <div className="mb-2 grid grid-cols-7 gap-1 md:gap-4 items-center">
                 <label className="truncate">Durata</label>
-                <input type="number" id="dur1set" value={ report.match.dur1set } onChange={ handleChange } className="block p-2 w-full form-input text-sm" />
-                <input type="number" id="dur2set" value={ report.match.dur2set } onChange={ handleChange } className="block p-2 w-full form-input text-sm" />
-                <input type="number" id="dur3set" value={ report.match.dur3set } onChange={ handleChange } className="block p-2 w-full form-input text-sm" />
-                <input type="number" id="dur4set" value={ report.match.dur4set } onChange={ handleChange } className="block p-2 w-full form-input text-sm" />
-                <input type="number" id="dur5set" value={ report.match.dur5set } onChange={ handleChange } className="block p-2 w-full form-input text-sm" />
-                <input type="number" id="dur6set" value={ report.match.dur6set } onChange={ handleChange } className="block p-2 w-full form-input text-sm" />
+                <input type="number" id="dur1set" value={ report.match.dur1set } onChange={ handleChange } onBlur={ handleBlur } className={`block p-2 w-full ${style.dur1set || 'form-input'}`} />
+                <input type="number" id="dur2set" value={ report.match.dur2set } onChange={ handleChange } onBlur={ handleBlur } className={`block p-2 w-full ${style.dur2set || 'form-input'}`} />
+                <input type="number" id="dur3set" value={ report.match.dur3set } onChange={ handleChange } onBlur={ handleBlur } className={`block p-2 w-full ${style.dur3set || 'form-input'}`} />
+                <input type="number" id="dur4set" value={ report.match.dur4set } onChange={ handleChange } onBlur={ handleBlur } className={`block p-2 w-full ${style.dur4set || 'form-input'}`} />
+                <input type="number" id="dur5set" value={ report.match.dur5set } onChange={ handleChange } onBlur={ handleBlur } className={`block p-2 w-full ${style.dur5set || 'form-input'}`} />
+                <input type="number" id="dur6set" value={ report.match.dur6set } onChange={ handleChange } onBlur={ handleBlur } className={`block p-2 w-full ${style.dur6set || 'form-input'}`} />
             </div>
         </div>
     )
 }
 
 const ImageArea = ({ report, setReport }) => {
+    const [ error, setError ] = useState();
+    const [ style, setStyle ] = useState({
+        aspect1ref: undefined, 
+        aspect2ref: undefined, 
+        delay1ref: undefined,
+        delay2ref: undefined,
+        prot1ref: undefined,
+        prot2ref: undefined,
+        whistle1ref: undefined,
+        whistle2ref: undefined,
+        complaint1ref: undefined,
+        complaint2ref: undefined,
+        image_notes: undefined
+    });
 
     const handleChange = e => {
         manageInput(e, 'image', setReport);
+    }
+
+    // Validating input
+    function handleBlur(e) {
+        const test = checkInput(e);
+        const inputId = e.currentTarget.id;
+        confirmBlur(test, inputId, setError, setStyle);
     }
 
     return (
@@ -448,6 +577,13 @@ const ImageArea = ({ report, setReport }) => {
             <div className="mb-4">
                 <h3 className="generic-title">Area Immagine</h3>
             </div>
+            {
+                error && (
+                    <div className="danger-alert dark:bg-red-200 dark:text-red-800" role="alert">
+                        <span className="font-medium">Attenzione!</span> { error }.
+                    </div>
+                )
+            }
             <div className="grid grid-cols-3 gap-1 md:gap-4 items-center">
                 <label></label>
                 <label className="form-label dark:text-gray-300">1° Arbitro</label>
@@ -459,11 +595,15 @@ const ImageArea = ({ report, setReport }) => {
                     id="aspect1ref" 
                     value={ report.image.aspect1ref } 
                     handleChange={ handleChange } 
+                    handleBlur={ handleBlur }
+                    classList={`block p-2 w-full ${style.aspect1ref || 'form-select'} text-sm`}
                 />
                 <ThreeOptions 
                     id="aspect2ref" 
                     value={ report.image.aspect2ref } 
                     handleChange={ handleChange } 
+                    handleBlur={ handleBlur }
+                    classList={`block p-2 w-full ${style.aspect2ref || 'form-select'} text-sm`}
                 />
             </div>
             <div className="mb-2 grid grid-cols-3 gap-1 md:gap-4 items-center">
@@ -472,7 +612,8 @@ const ImageArea = ({ report, setReport }) => {
                     id="delay1ref"
                     value={ report.image.delay1ref }
                     onChange={ handleChange } 
-                    className="form-select text-sm"
+                    onBlur={ handleBlur }
+                    className={`block p-2 w-full ${style.delay1ref || 'form-select'} text-sm`}
                 >
                     <option value="2">No</option>
                     <option value="1">Sì, fino a 10'</option>
@@ -482,7 +623,8 @@ const ImageArea = ({ report, setReport }) => {
                     id="delay2ref"
                     value={ report.image.delay2ref }
                     onChange={ handleChange }
-                    className="form-select text-sm"
+                    onBlur={ handleBlur }
+                    className={`block p-2 w-full ${style.delay2ref || 'form-select'} text-sm`}
                 >
                     <option value="2">No</option>
                     <option value="1">Sì, fino a 10'</option>
@@ -495,11 +637,15 @@ const ImageArea = ({ report, setReport }) => {
                     id="prot1ref"
                     value={ report.image.prot1ref } 
                     handleChange={ handleChange }
+                    handleBlur={ handleBlur }
+                    classList={`block p-2 w-full ${style.prot1ref || 'form-select'} text-sm`}
                 />
                 <ThreeOptions 
                     id="prot2ref"
                     value={ report.image.prot2ref } 
                     handleChange={ handleChange } 
+                    handleBlur={ handleBlur }
+                    classList={`block p-2 w-full ${style.prot2ref || 'form-select'} text-sm`}
                 />
             </div>
             <div className="mb-2 grid grid-cols-3 gap-1 md:gap-4 items-center">
@@ -508,11 +654,15 @@ const ImageArea = ({ report, setReport }) => {
                     id="whistle1ref"
                     value={ report.image.whistle1ref } 
                     handleChange={ handleChange } 
+                    handleBlur={ handleBlur }
+                    classList={`block p-2 w-full ${style.whistle1ref || 'form-select'} text-sm`}
                 />
                 <ThreeOptions 
                     id="whistle2ref" 
                     value={ report.image.whistle2ref } 
                     handleChange={ handleChange } 
+                    handleBlur={ handleBlur }
+                    classList={`block p-2 w-full ${style.whistle2ref || 'form-select'} text-sm`}
                 />
             </div>
             <div className="mb-4 grid grid-cols-3 gap-1 md:gap-4 items-center">
@@ -521,11 +671,15 @@ const ImageArea = ({ report, setReport }) => {
                     id="complaint1ref"
                     value={ report.image.complaint1ref } 
                     handleChange={ handleChange } 
+                    handleBlur={ handleBlur }
+                    classList={`block p-2 w-full ${style.complaint1ref || 'form-select'} text-sm`}
                 />
                 <ThreeOptions 
                     id="complaint2ref"
                     value={ report.image.complaint2ref } 
                     handleChange={ handleChange } 
+                    handleBlur={ handleBlur }
+                    classList={`block p-2 w-full ${style.complaint2ref || 'form-select'} text-sm`}
                 />
             </div>
             <div className="mb-2">
@@ -535,7 +689,8 @@ const ImageArea = ({ report, setReport }) => {
                     rows="4" 
                     value={ report.image.image_notes }
                     onChange={ handleChange }
-                    className="block p-2 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500" 
+                    onBlur={ handleBlur }
+                    className={`block p-2 w-full ${style.image_notes || 'form-input'}`}
                 />
             </div>
         </div>
@@ -543,9 +698,66 @@ const ImageArea = ({ report, setReport }) => {
 }
 
 const TechnicalArea = ({ report, setReport }) => {
+    const [ error, setError ] = useState();
+    const [ style, setStyle ] = useState({
+        complexity: undefined, 
+        tech1ref: undefined, 
+        tech2ref: undefined,
+        ballsinout_ord_1ref: undefined,
+        ballsinout_ord_2ref: undefined,
+        ballsinout_sev_1ref: undefined,
+        ballsinout_sev_2ref: undefined,
+        balltouches_ord_1ref: undefined,
+        balltouches_sev_1ref: undefined,
+        firsttouch_ord_1ref: undefined,
+        firsttouch_sev_1ref: undefined,
+        penetration_ord_1ref: undefined,
+        penetration_ord_2ref: undefined,
+        penetration_sev_1ref: undefined,
+        penetration_sev_2ref: undefined,
+        posfaults_ord_1ref: undefined,
+        posfaults_ord_2ref: undefined,
+        posfaults_sev_1ref: undefined,
+        posfaults_sev_2ref: undefined,
+        nettouches_ord_1ref: undefined,
+        nettouches_ord_2ref: undefined,
+        nettouches_sev_1ref: undefined,
+        nettouches_sev_2ref: undefined,
+        walltouches_ord_1ref: undefined,
+        walltouches_ord_2ref: undefined,
+        walltouches_sev_1ref: undefined,
+        walltouches_sev_2ref: undefined,
+        airplay_ord_1ref: undefined,
+        airplay_sev_1ref: undefined,
+        defensefaults_ord_1ref: undefined,
+        defensefaults_ord_2ref: undefined,
+        defensefaults_sev_1ref: undefined,
+        defensefaults_sev_2ref: undefined,
+        servefaults_ord_1ref: undefined,
+        servefaults_sev_1ref: undefined,
+        liberofaults_ord_1ref: undefined,
+        liberofaults_ord_2ref: undefined,
+        liberofaults_sev_1ref: undefined,
+        liberofaults_sev_2ref: undefined,
+        otherfaults_ord_1ref: undefined,
+        otherfaults_ord_2ref: undefined,
+        otherfaults_sev_1ref: undefined,
+        otherfaults_sev_2ref: undefined,
+        error_notes: undefined,
+        collab1ref: undefined,
+        collab2ref: undefined,
+        collab_notes: undefined
+    });
 
     const handleChange = e => {
         manageInput(e, 'technical', setReport);
+    }
+
+    // Validating input
+    function handleBlur(e) {
+        const test = checkInput(e);
+        const inputId = e.currentTarget.id;
+        confirmBlur(test, inputId, setError, setStyle);
     }
     
     return (
@@ -553,6 +765,13 @@ const TechnicalArea = ({ report, setReport }) => {
             <div className="mb-4">
                 <h3 className="generic-title">Area Tecnica</h3>
             </div>
+            {
+                error && (
+                    <div className="danger-alert dark:bg-red-200 dark:text-red-800" role="alert">
+                        <span className="font-medium">Attenzione!</span> { error }.
+                    </div>
+                )
+            }
             <div className="mb-2 grid grid-cols-4 gap-1 items-center">
                 <label htmlFor="complexity" className="form-label dark:text-gray-300">Complessità Tecnica</label>
                 <label></label>
@@ -565,6 +784,8 @@ const TechnicalArea = ({ report, setReport }) => {
                         id="complexity"
                         value={ report.technical.complexity }
                         handleChange={ handleChange } 
+                        handleBlur={ handleBlur }
+                        classList={`block p-2 w-full ${style.complexity || 'form-select'} text-sm`}
                     />
                 </span>
                 <label className="text-right">Tecnica Arbitrale</label>
@@ -572,11 +793,15 @@ const TechnicalArea = ({ report, setReport }) => {
                     id="tech1ref"
                     value={ report.technical.tech1ref } 
                     handleChange={ handleChange }
+                    handleBlur={ handleBlur }
+                    classList={`block p-2 w-full ${style.tech1ref || 'form-select'} text-sm`}
                 />
                 <FourOptions 
                     id="tech2ref"
                     value={ report.technical.tech2ref } 
                     handleChange={ handleChange }
+                    handleBlur={ handleBlur }
+                    classList={`block p-2 w-full ${style.tech1ref || 'form-select'} text-sm`}
                 />
             </div>
             <div className="mb-2">
@@ -606,14 +831,16 @@ const TechnicalArea = ({ report, setReport }) => {
                         id="ballsinout_ord_1ref"
                         value={ report.technical.ballsinout_ord_1ref }
                         onChange={ handleChange } 
-                        className="block p-2 w-full form-input text-sm" 
+                        onBlur={ handleBlur }
+                        className={`block p-2 w-full ${style.ballsinout_ord_1ref || 'form-input'}`}
                     />
                     <input 
                         type="number" 
                         id="ballsinout_ord_2ref"
                         value={ report.technical.ballsinout_ord_2ref }
                         onChange={ handleChange } 
-                        className="block p-2 w-full form-input text-sm" 
+                        onBlur={ handleBlur }
+                        className={`block p-2 w-full ${style.ballsinout_ord_2ref || 'form-input'}`}
                     />
                 </div>
                 <div className="grid grid-cols-2 gap-1">
@@ -622,14 +849,16 @@ const TechnicalArea = ({ report, setReport }) => {
                         id="ballsinout_sev_1ref"
                         value={ report.technical.ballsinout_sev_1ref }
                         onChange={ handleChange }
-                        className="block p-2 w-full form-input text-sm" 
+                        onBlur={ handleBlur }
+                        className={`block p-2 w-full ${style.ballsinout_sev_1ref || 'form-input'}`}
                     />
                     <input 
                         type="number" 
                         id="ballsinout_sev_2ref"
                         value={ report.technical.ballsinout_sev_2ref }
                         onChange={ handleChange } 
-                        className="block p-2 w-full form-input text-sm" 
+                        onBlur={ handleBlur }
+                        className={`block p-2 w-full ${style.ballsinout_sev_2ref || 'form-input'}`}
                     />
                 </div>
             </div>
@@ -641,7 +870,8 @@ const TechnicalArea = ({ report, setReport }) => {
                         id="balltouches_ord_1ref"
                         value={ report.technical.balltouches_ord_1ref }
                         onChange={ handleChange } 
-                        className="block p-2 w-full form-input text-sm" 
+                        onBlur={ handleBlur }
+                        className={`block p-2 w-full ${style.balltouches_ord_1ref || 'form-input'}`}
                         />
                     <input type="number" className="block p-2 w-full form-input-disabled text-sm" disabled />
                 </div>
@@ -651,7 +881,8 @@ const TechnicalArea = ({ report, setReport }) => {
                         id="balltouches_sev_1ref"
                         value={ report.technical.balltouches_sev_1ref }
                         onChange={ handleChange }
-                        className="block p-2 w-full form-input text-sm"
+                        onBlur={ handleBlur }
+                        className={`block p-2 w-full ${style.balltouches_sev_1ref || 'form-input'}`}
                     />
                     <input type="number" className="block p-2 w-full form-input-disabled text-sm" disabled />
                 </div>
@@ -664,7 +895,8 @@ const TechnicalArea = ({ report, setReport }) => {
                         id="firsttouch_ord_1ref"
                         value={ report.technical.firsttouch_ord_1ref }
                         onChange={ handleChange }
-                        className="block p-2 w-full form-input text-sm" 
+                        onBlur={ handleBlur }
+                        className={`block p-2 w-full ${style.firsttouch_ord_1ref || 'form-input'}`}
                     />
                     <input type="number" className="block p-2 w-full form-input-disabled text-sm" disabled />
                 </div>
@@ -674,7 +906,8 @@ const TechnicalArea = ({ report, setReport }) => {
                         id="firsttouch_sev_1ref"
                         value={ report.technical.firsttouch_sev_1ref }
                         onChange={ handleChange }
-                        className="block p-2 w-full form-input text-sm" 
+                        onBlur={ handleBlur }
+                        className={`block p-2 w-full ${style.firsttouch_sev_1ref || 'form-input'}`}
                     />
                     <input type="number" className="block p-2 w-full form-input-disabled text-sm" disabled />
                 </div>
@@ -687,14 +920,16 @@ const TechnicalArea = ({ report, setReport }) => {
                         id="penetration_ord_1ref" 
                         value={ report.technical.penetration_ord_1ref }
                         onChange={ handleChange }
-                        className="block p-2 w-full form-input text-sm" 
+                        onBlur={ handleBlur }
+                        className={`block p-2 w-full ${style.penetration_ord_1ref || 'form-input'}`}
                     />
                     <input 
                         type="number" 
                         id="penetration_ord_2ref" 
                         value={ report.technical.penetration_ord_2ref }
                         onChange={ handleChange }
-                        className="block p-2 w-full form-input text-sm" 
+                        onBlur={ handleBlur }
+                        className={`block p-2 w-full ${style.penetration_ord_2ref || 'form-input'}`}
                     />
                 </div>
                 <div className="grid grid-cols-2 gap-1">
@@ -703,14 +938,16 @@ const TechnicalArea = ({ report, setReport }) => {
                         id="penetration_sev_1ref" 
                         value={ report.technical.penetration_sev_1ref }
                         onChange={ handleChange }
-                        className="block p-2 w-full form-input text-sm" 
+                        onBlur={ handleBlur }
+                        className={`block p-2 w-full ${style.penetration_sev_1ref || 'form-input'}`}
                     />
                     <input 
                         type="number" 
                         id="penetration_sev_2ref" 
                         value={ report.technical.penetration_sev_2ref }
                         onChange={ handleChange }
-                        className="block p-2 w-full form-input text-sm" 
+                        onBlur={ handleBlur }
+                        className={`block p-2 w-full ${style.penetration_sev_2ref || 'form-input'}`}
                     />
                 </div>
             </div>
@@ -722,14 +959,16 @@ const TechnicalArea = ({ report, setReport }) => {
                         id="posfaults_ord_1ref" 
                         value={ report.technical.posfaults_ord_1ref }
                         onChange={ handleChange }
-                        className="block p-2 w-full form-input text-sm" 
+                        onBlur={ handleBlur }
+                        className={`block p-2 w-full ${style.posfaults_ord_1ref || 'form-input'}`}
                     />
                     <input 
                         type="number" 
                         id="posfaults_ord_2ref" 
                         value={ report.technical.posfaults_ord_2ref }
                         onChange={ handleChange }
-                        className="block p-2 w-full form-input text-sm" 
+                        onBlur={ handleBlur }
+                        className={`block p-2 w-full ${style.posfaults_ord_2ref || 'form-input'}`}
                     />
                 </div>
                 <div className="grid grid-cols-2 gap-1">
@@ -738,14 +977,16 @@ const TechnicalArea = ({ report, setReport }) => {
                         id="posfaults_sev_1ref" 
                         value={ report.technical.posfaults_sev_1ref }
                         onChange={ handleChange }
-                        className="block p-2 w-full form-input text-sm" 
+                        onBlur={ handleBlur }
+                        className={`block p-2 w-full ${style.posfaults_sev_1ref || 'form-input'}`}
                     />
                     <input 
                         type="number" 
                         id="posfaults_sev_2ref" 
                         value={ report.technical.posfaults_sev_2ref }
                         onChange={ handleChange }
-                        className="block p-2 w-full form-input text-sm" 
+                        onBlur={ handleBlur }
+                        className={`block p-2 w-full ${style.posfaults_sev_2ref || 'form-input'}`}
                     />
                 </div>
             </div>
@@ -757,14 +998,16 @@ const TechnicalArea = ({ report, setReport }) => {
                         id="nettouches_ord_1ref" 
                         value={ report.technical.nettouches_ord_1ref }
                         onChange={ handleChange }
-                        className="block p-2 w-full form-input text-sm" 
+                        onBlur={ handleBlur }
+                        className={`block p-2 w-full ${style.nettouches_ord_1ref || 'form-input'}`}
                     />
                     <input 
                         type="number" 
                         id="nettouches_ord_2ref" 
                         value={ report.technical.nettouches_ord_2ref }
                         onChange={ handleChange }
-                        className="block p-2 w-full form-input text-sm" 
+                        onBlur={ handleBlur }
+                        className={`block p-2 w-full ${style.nettouches_ord_2ref || 'form-input'}`}
                     />
                 </div>
                 <div className="grid grid-cols-2 gap-1">
@@ -773,14 +1016,16 @@ const TechnicalArea = ({ report, setReport }) => {
                         id="nettouches_sev_1ref" 
                         value={ report.technical.nettouches_sev_1ref }
                         onChange={ handleChange }
-                        className="block p-2 w-full form-input text-sm" 
+                        onBlur={ handleBlur }
+                        className={`block p-2 w-full ${style.nettouches_sev_1ref || 'form-input'}`}
                     />
                     <input 
                         type="number" 
                         id="nettouches_sev_2ref" 
                         value={ report.technical.nettouches_sev_2ref }
                         onChange={ handleChange }
-                        className="block p-2 w-full form-input text-sm" 
+                        onBlur={ handleBlur }
+                        className={`block p-2 w-full ${style.nettouches_sev_2ref || 'form-input'}`}
                     />
                 </div>
             </div>
@@ -792,14 +1037,16 @@ const TechnicalArea = ({ report, setReport }) => {
                         id="walltouches_ord_1ref" 
                         value={ report.technical.walltouches_ord_1ref }
                         onChange={ handleChange }
-                        className="block p-2 w-full form-input text-sm" 
+                        onBlur={ handleBlur }
+                        className={`block p-2 w-full ${style.walltouches_ord_1ref || 'form-input'}`}
                     />
                     <input 
                         type="number" 
                         id="walltouches_ord_2ref" 
                         value={ report.technical.walltouches_ord_2ref }
                         onChange={ handleChange }
-                        className="block p-2 w-full form-input text-sm"
+                        onBlur={ handleBlur }
+                        className={`block p-2 w-full ${style.walltouches_ord_2ref || 'form-input'}`}
                     />
                 </div>
                 <div className="grid grid-cols-2 gap-1">
@@ -808,14 +1055,16 @@ const TechnicalArea = ({ report, setReport }) => {
                         id="walltouches_sev_1ref" 
                         value={ report.technical.walltouches_sev_1ref }
                         onChange={ handleChange }
-                        className="block p-2 w-full form-input text-sm" 
+                        onBlur={ handleBlur }
+                        className={`block p-2 w-full ${style.walltouches_sev_1ref || 'form-input'}`}
                     />
                     <input
                         type="number" 
                         id="walltouches_sev_2ref" 
                         value={ report.technical.walltouches_sev_2ref }
                         onChange={ handleChange }
-                        className="block p-2 w-full form-input text-sm" 
+                        onBlur={ handleBlur }
+                        className={`block p-2 w-full ${style.walltouches_sev_2ref || 'form-input'}`}
                     />
                 </div>
             </div>
@@ -827,7 +1076,8 @@ const TechnicalArea = ({ report, setReport }) => {
                         id="airplay_ord_1ref" 
                         value={ report.technical.airplay_ord_1ref }
                         onChange={ handleChange }
-                        className="block p-2 w-full form-input text-sm" 
+                        onBlur={ handleBlur }
+                        className={`block p-2 w-full ${style.airplay_ord_1ref || 'form-input'}`}
                     />
                     <input type="number" className="block p-2 w-full form-input-disabled text-sm" disabled />
                 </div>
@@ -837,7 +1087,8 @@ const TechnicalArea = ({ report, setReport }) => {
                         id="airplay_sev_1ref" 
                         value={ report.technical.airplay_sev_1ref }
                         onChange={ handleChange }
-                        className="block p-2 w-full form-input text-sm" 
+                        onBlur={ handleBlur }
+                        className={`block p-2 w-full ${style.airplay_sev_1ref || 'form-input'}`}
                     />
                     <input type="number" className="block p-2 w-full form-input-disabled text-sm" disabled />
                 </div>
@@ -850,14 +1101,16 @@ const TechnicalArea = ({ report, setReport }) => {
                         id="defensefaults_ord_1ref" 
                         value={ report.technical.defensefaults_ord_1ref }
                         onChange={ handleChange }
-                        className="block p-2 w-full form-input text-sm" 
+                        onBlur={ handleBlur }
+                        className={`block p-2 w-full ${style.defensefaults_ord_1ref || 'form-input'}`}
                     />
                     <input 
                         type="number" 
                         id="defensefaults_ord_2ref" 
                         value={ report.technical.defensefaults_ord_2ref }
                         onChange={ handleChange }
-                        className="block p-2 w-full form-input text-sm" 
+                        onBlur={ handleBlur }
+                        className={`block p-2 w-full ${style.defensefaults_ord_2ref || 'form-input'}`}
                     />
                 </div>
                 <div className="grid grid-cols-2 gap-1">
@@ -866,14 +1119,16 @@ const TechnicalArea = ({ report, setReport }) => {
                         id="defensefaults_sev_1ref" 
                         value={ report.technical.defensefaults_sev_1ref }
                         onChange={ handleChange }
-                        className="block p-2 w-full form-input text-sm" 
+                        onBlur={ handleBlur }
+                        className={`block p-2 w-full ${style.defensefaults_sev_1ref || 'form-input'}`}
                     />
                     <input 
                         type="number" 
                         id="defensefaults_sev_2ref" 
                         value={ report.technical.defensefaults_sev_2ref }
                         onChange={ handleChange }
-                        className="block p-2 w-full form-input text-sm" 
+                        onBlur={ handleBlur }
+                        className={`block p-2 w-full ${style.defensefaults_sev_2ref || 'form-input'}`}
                     />
                 </div>
             </div>
@@ -885,7 +1140,8 @@ const TechnicalArea = ({ report, setReport }) => {
                         id="servefaults_ord_1ref" 
                         value={ report.technical.servefaults_ord_1ref }
                         onChange={ handleChange }
-                        className="block p-2 w-full form-input text-sm" 
+                        onBlur={ handleBlur }
+                        className={`block p-2 w-full ${style.servefaults_ord_1ref || 'form-input'}`}
                     />
                     <input type="number" className="block p-2 w-full form-input-disabled text-sm" disabled />
                 </div>
@@ -895,7 +1151,8 @@ const TechnicalArea = ({ report, setReport }) => {
                         id="servefaults_sev_1ref" 
                         value={ report.technical.servefaults_sev_1ref }
                         onChange={ handleChange }
-                        className="block p-2 w-full form-input text-sm" 
+                        onBlur={ handleBlur }
+                        className={`block p-2 w-full ${style.servefaults_sev_1ref || 'form-input'}`}
                     />
                     <input type="number" className="block p-2 w-full form-input-disabled text-sm" disabled />
                 </div>
@@ -908,14 +1165,16 @@ const TechnicalArea = ({ report, setReport }) => {
                         id="liberofaults_ord_1ref" 
                         value={ report.technical.liberofaults_ord_1ref }
                         onChange={ handleChange }
-                        className="block p-2 w-full form-input text-sm" 
+                        onBlur={ handleBlur }
+                        className={`block p-2 w-full ${style.liberofaults_ord_1ref || 'form-input'}`}
                     />
                     <input 
                         type="number" 
                         id="liberofaults_ord_2ref" 
                         value={ report.technical.liberofaults_ord_2ref }
                         onChange={ handleChange }
-                        className="block p-2 w-full form-input text-sm" 
+                        onBlur={ handleBlur }
+                        className={`block p-2 w-full ${style.liberofaults_ord_2ref || 'form-input'}`}
                     />
                 </div>
                 <div className="grid grid-cols-2 gap-1">
@@ -924,14 +1183,16 @@ const TechnicalArea = ({ report, setReport }) => {
                         id="liberofaults_sev_1ref" 
                         value={ report.technical.liberofaults_sev_1ref }
                         onChange={ handleChange }
-                        className="block p-2 w-full form-input text-sm" 
+                        onBlur={ handleBlur }
+                        className={`block p-2 w-full ${style.liberofaults_sev_1ref || 'form-input'}`}
                     />
                     <input 
                         type="number" 
                         id="liberofaults_sev_2ref" 
                         value={ report.technical.liberofaults_sev_2ref }
                         onChange={ handleChange }
-                        className="block p-2 w-full form-input text-sm" 
+                        onBlur={ handleBlur }
+                        className={`block p-2 w-full ${style.liberofaults_sev_2ref || 'form-input'}`}
                     />
                 </div>
             </div>
@@ -943,14 +1204,16 @@ const TechnicalArea = ({ report, setReport }) => {
                         id="otherfaults_ord_1ref"
                         value={ report.technical.otherfaults_ord_1ref }
                         onChange={ handleChange }
-                        className="block p-2 w-full form-input text-sm" 
+                        onBlur={ handleBlur }
+                        className={`block p-2 w-full ${style.otherfaults_ord_1ref || 'form-input'}`}
                     />
                     <input 
                         type="number" 
                         id="otherfaults_ord_2ref" 
                         value={ report.technical.otherfaults_ord_2ref }
                         onChange={ handleChange }
-                        className="block p-2 w-full form-input text-sm" 
+                        onBlur={ handleBlur }
+                        className={`block p-2 w-full ${style.otherfaults_ord_2ref || 'form-input'}`}
                     />
                 </div>
                 <div className="grid grid-cols-2 gap-1">
@@ -959,14 +1222,16 @@ const TechnicalArea = ({ report, setReport }) => {
                         id="otherfaults_sev_1ref" 
                         value={ report.technical.otherfaults_sev_1ref }
                         onChange={ handleChange }
-                        className="block p-2 w-full form-input text-sm" 
+                        onBlur={ handleBlur }
+                        className={`block p-2 w-full ${style.otherfaults_sev_1ref || 'form-input'}`}
                     />
                     <input 
                         type="number" 
                         id="otherfaults_sev_2ref" 
                         value={ report.technical.otherfaults_sev_2ref }
                         onChange={ handleChange }
-                        className="block p-2 w-full form-input text-sm" 
+                        onBlur={ handleBlur }
+                        className={`block p-2 w-full ${style.otherfaults_sev_2ref || 'form-input'}`}
                     />
                 </div>
             </div>
@@ -977,7 +1242,8 @@ const TechnicalArea = ({ report, setReport }) => {
                     rows="4" 
                     value={ report.technical.error_notes }
                     onChange={ handleChange }
-                    className="block p-2 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500" 
+                    onBlur={ handleBlur }
+                    className={`block p-2 w-full ${style.error_notes || 'form-input'}`}
                 />
             </div>
             <div className="mb-2 grid grid-cols-3 gap-1 items-center">
@@ -991,11 +1257,15 @@ const TechnicalArea = ({ report, setReport }) => {
                     id="collab1ref"
                     value={ report.technical.collab1ref }
                     handleChange={ handleChange } 
+                    handleBlur={ handleBlur }
+                    classList={`block p-2 w-full ${style.collab1ref || 'form-select'} text-sm`}
                 />
                 <FourOptions 
                     id="collab2ref"
                     value={ report.technical.collab2ref }
                     handleChange={ handleChange } 
+                    handleBlur={ handleBlur }
+                    classList={`block p-2 w-full ${style.collab2ref || 'form-select'} text-sm`}
                 />
             </div>
             <div className="mb-2">
@@ -1005,7 +1275,8 @@ const TechnicalArea = ({ report, setReport }) => {
                     rows="4" 
                     value={ report.technical.collab_notes }
                     onChange={ handleChange }
-                    className="block p-2 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500" 
+                    onBlur={ handleBlur }
+                    className={`block p-2 w-full ${style.collab_notes || 'form-input'}`}
                 />
             </div>
         </div>
@@ -1013,9 +1284,25 @@ const TechnicalArea = ({ report, setReport }) => {
 }
 
 const RelArea = ({ report, setReport }) => {
+    const [ error, setError ] = useState();
+    const [ style, setStyle ] = useState({
+        gest_difficulty: undefined, 
+        gest1ref: undefined, 
+        gest2ref: undefined,
+        conc1ref: undefined,
+        conc2ref: undefined,
+        rel_notes: undefined
+    });
 
     const handleChange = e => {
         manageInput(e, 'relational', setReport);
+    }
+
+    // Validating input
+    function handleBlur(e) {
+        const test = checkInput(e);
+        const inputId = e.currentTarget.id;
+        confirmBlur(test, inputId, setError, setStyle);
     }
 
     return (
@@ -1023,13 +1310,22 @@ const RelArea = ({ report, setReport }) => {
             <div className="mb-4">
                 <h3 className="generic-title">Area Relazionale</h3>
             </div>
+            {
+                error && (
+                    <div className="danger-alert dark:bg-red-200 dark:text-red-800" role="alert">
+                        <span className="font-medium">Attenzione!</span> { error }.
+                    </div>
+                )
+            }
             <div className="mb-4">
                 <div>
                     <label htmlFor="gest_difficulty" className="form-label dark:text-gray-300">Complessità gestionale</label>
                     <DifficOptions 
                         id="gest_difficulty"
                         value={ report.relational.gest_difficulty }
-                        handleChange={ handleChange } 
+                        handleChange={ handleChange }
+                        handleBlur={ handleBlur }
+                        classList={`block p-2 w-full ${style.gest_difficulty || 'form-select'} text-sm`}
                     />
                 </div>
             </div>
@@ -1044,11 +1340,15 @@ const RelArea = ({ report, setReport }) => {
                     id="gest1ref"
                     value={ report.relational.gest1ref }
                     handleChange={ handleChange } 
+                    handleBlur={ handleBlur }
+                    classList={`block p-2 w-full ${style.gest1ref || 'form-select'} text-sm`}
                 />
                 <FourOptions 
                     id="gest2ref"
                     value={ report.relational.gest2ref }
                     handleChange={ handleChange } 
+                    handleBlur={ handleBlur }
+                    classList={`block p-2 w-full ${style.gest2ref || 'form-select'} text-sm`}
                 />
             </div>
             <div className="mb-4 grid grid-cols-3 gap-1 items-center">
@@ -1057,11 +1357,15 @@ const RelArea = ({ report, setReport }) => {
                     id="conc1ref" 
                     value={ report.relational.conc1ref }
                     handleChange={ handleChange }
+                    handleBlur={ handleBlur }
+                    classList={`block p-2 w-full ${style.conc1ref || 'form-select'} text-sm`}
                 />
                 <FourOptions 
                     id="conc2ref" 
                     value={ report.relational.conc2ref }
                     handleChange={ handleChange }
+                    handleBlur={ handleBlur }
+                    classList={`block p-2 w-full ${style.conc2ref || 'form-select'} text-sm`}
                 />
             </div>
             <div className="mb-2">
@@ -1071,7 +1375,8 @@ const RelArea = ({ report, setReport }) => {
                     rows="4" 
                     value={ report.relational.rel_notes }
                     onChange={ handleChange }
-                    className="block p-2 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500" 
+                    onBlur={ handleBlur }
+                    className={`block p-2 w-full ${style.rel_notes || 'form-input'}`}
                 />
             </div>
         </div>
@@ -1079,9 +1384,30 @@ const RelArea = ({ report, setReport }) => {
 }
 
 const DisciplineArea = ({ report, setReport }) => {
+    const [ error, setError ] = useState();
+    const [ style, setStyle ] = useState({
+        gest_discipline: undefined, 
+        d_verbals: undefined, 
+        d_officials: undefined,
+        d_penals: undefined,
+        d_expulsions: undefined,
+        d_squalifications: undefined,
+        discipline: undefined, 
+        disc_interation: undefined, 
+        delays1ref: undefined,
+        delays2ref: undefined,
+        disc_notes: undefined
+    });
 
     const handleChange = e => {
         manageInput(e, 'discipline', setReport);
+    }
+
+    // Validating input
+    function handleBlur(e) {
+        const test = checkInput(e);
+        const inputId = e.currentTarget.id;
+        confirmBlur(test, inputId, setError, setStyle);
     }
 
     return (
@@ -1089,13 +1415,22 @@ const DisciplineArea = ({ report, setReport }) => {
             <div className="mb-4">
                 <h3 className="generic-title">Area Disciplinare</h3>
             </div>
+            {
+                error && (
+                    <div className="danger-alert dark:bg-red-200 dark:text-red-800" role="alert">
+                        <span className="font-medium">Attenzione!</span> { error }.
+                    </div>
+                )
+            }
             <div className="mb-4">
                 <div>
-                    <label htmlFor="gest_difficulty" className="form-label dark:text-gray-300">Complessità disciplinare</label>
+                    <label htmlFor="gest_discipline" className="form-label dark:text-gray-300">Complessità disciplinare</label>
                     <DifficOptions
-                        id="gest_difficulty"
+                        id="gest_discipline"
                         value={ report.discipline.gest_difficulty }
                         handleChange={ handleChange } 
+                        handleBlur={ handleBlur }
+                        classList={`block p-2 w-full ${style.gest_difficulty || 'form-select'} text-sm`}
                     />
                 </div>
             </div>
@@ -1106,6 +1441,8 @@ const DisciplineArea = ({ report, setReport }) => {
                         id="d_verbals"
                         value={ report.discipline.d_verbals }
                         handleChange={ handleChange } 
+                        handleBlur={ handleBlur }
+                        classList={`block p-2 w-full ${style.d_verbals || 'form-select'} text-sm`}
                     />
                 </div>
                 <div>
@@ -1114,6 +1451,8 @@ const DisciplineArea = ({ report, setReport }) => {
                         id="d_officials" 
                         value={ report.discipline.d_officials }
                         handleChange={ handleChange }
+                        handleBlur={ handleBlur }
+                        classList={`block p-2 w-full ${style.d_officials || 'form-select'} text-sm`}
                     />
                 </div>
                 <div>
@@ -1122,6 +1461,8 @@ const DisciplineArea = ({ report, setReport }) => {
                         id="d_penals"
                         value={ report.discipline.d_penals }
                         handleChange={ handleChange }
+                        handleBlur={ handleBlur }
+                        classList={`block p-2 w-full ${style.d_penals || 'form-select'} text-sm`}
                     />
                 </div>
                 <div>
@@ -1130,6 +1471,8 @@ const DisciplineArea = ({ report, setReport }) => {
                         id="d_expulsions"
                         value={ report.discipline.d_expulsions }
                         handleChange={ handleChange }
+                        handleBlur={ handleBlur }
+                        classList={`block p-2 w-full ${style.d_expulsions || 'form-select'} text-sm`}
                     />
                 </div>
                 <div>
@@ -1138,6 +1481,8 @@ const DisciplineArea = ({ report, setReport }) => {
                         id="d_squalifications"
                         value={ report.discipline.d_squalifications }
                         handleChange={ handleChange }
+                        handleBlur={ handleBlur }
+                        classList={`block p-2 w-full ${style.d_squalifications || 'form-select'} text-sm`}
                     />
                 </div>
             </div>
@@ -1152,6 +1497,8 @@ const DisciplineArea = ({ report, setReport }) => {
                     id="discipline" 
                     value={ report.discipline.discipline }
                     handleChange={ handleChange }
+                    handleBlur={ handleBlur }
+                    classList={`block p-2 w-full ${style.discipline || 'form-select'} text-sm`}
                 />
                 <select className="block p-2 w-full form-input-disabled text-sm" disabled />
             </div>
@@ -1162,6 +1509,8 @@ const DisciplineArea = ({ report, setReport }) => {
                     id="disc_interation"
                     value={ report.discipline.disc_interation }
                     handleChange={ handleChange }
+                    handleBlur={ handleBlur }
+                    classList={`block p-2 w-full ${style.disc_interation || 'form-select'} text-sm`}
                 />
             </div>
             <div className="mb-4 grid grid-cols-3 gap-1 items-center">
@@ -1170,11 +1519,15 @@ const DisciplineArea = ({ report, setReport }) => {
                     id="delays1ref"
                     value={ report.discipline.delays1ref }
                     handleChange={ handleChange }
+                    handleBlur={ handleBlur }
+                    classList={`block p-2 w-full ${style.delays1ref || 'form-select'} text-sm`}
                 />
                 <FourOptions
                     id="delays2ref"
                     value={ report.discipline.delays2ref }
                     handleChange={ handleChange }
+                    handleBlur={ handleBlur }
+                    classList={`block p-2 w-full ${style.delays2ref || 'form-select'} text-sm`}
                 />
             </div>
             <div className="mb-2">
@@ -1184,7 +1537,8 @@ const DisciplineArea = ({ report, setReport }) => {
                     rows="4" 
                     value={ report.discipline.disc_notes }
                     onChange={ handleChange }
-                    className="block p-2 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500" 
+                    onBlur={ handleBlur }
+                    className={`block p-2 w-full ${style.disc_notes || 'form-input'}`}
                 />
             </div>
         </div>
@@ -1192,9 +1546,22 @@ const DisciplineArea = ({ report, setReport }) => {
 }
 
 const InterviewArea = ({ report, setReport }) => {
+    const [ error, setError ] = useState();
+    const [ style, setStyle ] = useState({
+        interview1ref: undefined, 
+        interview2ref: undefined, 
+        interview_notes: undefined
+    });
 
     const handleChange = e => {
         manageInput(e, 'interview', setReport);
+    }
+
+    // Validating input
+    function handleBlur(e) {
+        const test = checkInput(e);
+        const inputId = e.currentTarget.id;
+        confirmBlur(test, inputId, setError, setStyle);
     }
 
     return (
@@ -1202,6 +1569,13 @@ const InterviewArea = ({ report, setReport }) => {
             <div className="mb-4">
                 <h3 className="generic-title">Colloquio</h3>
             </div>
+            {
+                error && (
+                    <div className="danger-alert dark:bg-red-200 dark:text-red-800" role="alert">
+                        <span className="font-medium">Attenzione!</span> { error }.
+                    </div>
+                )
+            }
             <div className="grid grid-cols-3 gap-1 items-center">
                 <label></label>
                 <label className="form-label dark:text-gray-300">1° Arbitro</label>
@@ -1213,7 +1587,8 @@ const InterviewArea = ({ report, setReport }) => {
                     id="interview1ref" 
                     value={ report.interview.interview1ref }
                     onChange={ handleChange } 
-                    className="form-select text-sm"
+                    onBlur={ handleBlur }
+                    className={`block p-2 w-full ${style.interview1ref || 'form-select'} text-sm`}
                 >
                     <option value="2">Nella norma</option>
                     <option value="1">Zelante e/o polemico</option>
@@ -1223,7 +1598,8 @@ const InterviewArea = ({ report, setReport }) => {
                     id="interview2ref" 
                     value={ report.interview.interview2ref }
                     onChange={ handleChange }
-                    className="form-select text-sm"
+                    onBlur={ handleBlur }
+                    className={`block p-2 w-full ${style.interview2ref || 'form-select'} text-sm`}
                 >
                     <option value="2">Nella norma</option>
                     <option value="1">Zelante e/o polemico</option>
@@ -1237,7 +1613,8 @@ const InterviewArea = ({ report, setReport }) => {
                     rows="4" 
                     value={ report.interview.interview_notes }
                     onChange={ handleChange }
-                    className="block p-2 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500" 
+                    onBlur={ handleBlur }
+                    className={`block p-2 w-full ${style.interview_notes || 'form-input'}`}
                 />
             </div>
         </div>
@@ -1245,9 +1622,21 @@ const InterviewArea = ({ report, setReport }) => {
 }
 
 const EventsArea = ({ report, setReport }) => {
+    const [ error, setError ] = useState();
+    const [ style, setStyle ] = useState({
+        finalvote1ref: undefined, 
+        finalvote2ref: undefined
+    });
     
     const handleChange = e => {
         manageInput(e, 'events', setReport);
+    }
+
+    // Validating input
+    function handleBlur(e) {
+        const test = checkInput(e);
+        const inputId = e.currentTarget.id;
+        confirmBlur(test, inputId, setError, setStyle);
     }
 
     return (
@@ -1266,7 +1655,8 @@ const EventsArea = ({ report, setReport }) => {
                     id="finalvote1ref" 
                     value={ report.events.finalvote1ref }
                     onChange={ handleChange } 
-                    className="form-select text-sm"
+                    onBlur={ handleBlur }
+                    className={`block p-2 w-full ${style.finalvote1ref || 'form-select'} text-sm`}
                 >
                     <option value="4">Eccellente</option>
                     <option value="3">Buona</option>
@@ -1278,7 +1668,8 @@ const EventsArea = ({ report, setReport }) => {
                     id="finalvote2ref" 
                     value={ report.events.finalvote2ref }
                     onChange={ handleChange }
-                    className="form-select text-sm"
+                    onBlur={ handleBlur }
+                    className={`block p-2 w-full ${style.finalvote2ref || 'form-select'} text-sm`}
                 >
                     <option value="4">Eccellente</option>
                     <option value="3">Buona</option>
@@ -1291,8 +1682,7 @@ const EventsArea = ({ report, setReport }) => {
     )
 }
 
-function ReportForm () {
-    const [ report, setReport ] = useState(blankReport);
+function ReportForm ({report, setReport, toggleModal}) {
 
     return (
         <div className="container flex">
@@ -1305,6 +1695,13 @@ function ReportForm () {
                 <DisciplineArea report={ report } setReport={ setReport} />
                 <InterviewArea  report={ report } setReport={ setReport} />
                 <EventsArea     report={ report } setReport={ setReport} />
+                <button 
+                    className="btn-default mb-4" 
+                    data-modal-toggle="reportModal"
+                    onClick={toggleModal}
+                >
+                    Invia Report
+                </button>
             </form>
         </div>
     )
