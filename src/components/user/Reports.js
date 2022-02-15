@@ -145,6 +145,7 @@ function Reports() {
     const [ button, setButton ] = useState('new');
     const [ error, setError ] = useState(false);
     const [ modal, setModal ] = useState(false);
+    // const [ sendReport, setSendReport ] = useState(false);
     const [ report, setReport ] = useState(blankReport);
     const [ reports, setReports ] = useState([]);
     const [ title, setTitle ] = useTitle();
@@ -175,7 +176,7 @@ function Reports() {
         API.get('reports', true).then(res => {
             res.success && setReports(res.reports);
         });
-    }, [API, setReports]);
+    }, [setReports]);
 
     return (
         <main className="container mx-auto px-5 py-20 lg:px-10 md:py-48">
@@ -185,9 +186,16 @@ function Reports() {
             >
                 { button === 'new' ? 'Nuovo Report' : 'Torna ai Report' }
             </button>
+            {
+                error && (
+                    <div className="danger-alert dark:bg-red-200 dark:text-red-800" role="alert">
+                        { error }.
+                    </div>
+                )
+            }
             { button === 'edit' && <ReportForm report={report} setReport={setReport} toggleModal={toggleModal} /> }
             { button === 'new' && <ReportTable reports={reports} /> }
-            <ReportModal modal={modal} toggleModal={toggleModal} />
+            <ReportModal modal={modal} report={report} setButton={setButton} setError={setError} setReports={setReports} toggleModal={toggleModal} />
         </main>
     )
 }

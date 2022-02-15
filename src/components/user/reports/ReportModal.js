@@ -1,6 +1,30 @@
 import React from "react";
+import { serviceProvider as API } from "../../../API/api";
 
-function ReportModal({ modal, toggleModal }) {
+function ReportModal({ modal, report, setButton, setError, setReports, toggleModal }) {
+
+    function sendReport(e) {
+        e.preventDefault();
+        API.insert('reports', JSON.stringify(report), true)
+            .then(res => {
+                if (res?.success) {
+                    setReports(prevState => [...prevState, res.report]
+                        .sort((a, b) => {
+                            const date1 = new Date(a.general.date);
+                            const date2 = new Date(b.general.date);
+                            if (date1 > date2) return 1;
+                            if (date1 < date2) return -1;
+                            return 0;
+                        })
+                    );
+                    setButton('new');
+                } else {
+                    setError(res?.msg || 'Qualcosa è andato storto, si prega di riprovare');
+                    setButton('new');
+                }
+            });
+        toggleModal(e);
+    }
 
     return (
         <div id="reportModal" aria-hidden={ modal ? 'false' : 'true' } className={ `${ modal ? 'flex' : 'hidden'} overflow-y-auto overflow-x-hidden fixed right-0 left-0 top-4 z-50 justify-center items-center h-modal md:h-full md:inset-0` }>
@@ -29,7 +53,13 @@ function ReportModal({ modal, toggleModal }) {
                     </div>
                     {/* <!-- Modal footer --> */}
                     <div className="flex items-center p-6 space-x-2 rounded-b border-t border-gray-200 dark:border-gray-600">
-                        <button data-modal-toggle="reportModal" type="button" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Conferma</button>
+                        <button 
+                            data-modal-toggle="reportModal" 
+                            type="button" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                            onClick={sendReport}
+                        >
+                            Conferma
+                        </button>
                         <button 
                             data-modal-toggle="reportModal" 
                             type="button" 

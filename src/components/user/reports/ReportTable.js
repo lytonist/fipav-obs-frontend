@@ -1,7 +1,20 @@
 import React from 'react';
 
-function ReportRow({ report }) {
-
+function ReportRow({ index, report }) {
+    return (
+        <tr className={`border-b ${ index % 2 ? 'bg-gray-50 dark:bg-gray-800' : 'bg-white dark:bg-gray-700' } dark:border-gray-600`}>
+            <td className="py-4 px-6 text-sm text-gray-500 whitespace-nowrap dark:text-gray-400">{new Date(report.general.date).toLocaleDateString('it-IT')}, {report.general.time}</td>
+            <td className="py-4 px-6 text-sm text-gray-500 whitespace-nowrap dark:text-gray-400">{report.general.match_num}</td>
+            <td className="py-4 px-6 text-sm text-gray-500 whitespace-nowrap dark:text-gray-400">{report.general.teams}</td>
+            <td className="py-4 px-6 text-sm text-gray-500 whitespace-nowrap dark:text-gray-400">
+                {`${report.general.first_ref.lastname} ${report.general.first_ref.firstname[0]}.`}
+                {report.general.second_ref && ` - ${report.general.second_ref.lastname} ${report.general.second_ref.firstname[0]}.`}
+            </td>
+            <td className="py-4 px-6 text-sm text-gray-500 whitespace-nowrap text-right dark:text-gray-400">
+                <button className='btn-edit'>Edit</button>
+            </td>
+        </tr>
+    )
 }
 
 function ReportTable({ reports }) {
@@ -12,7 +25,7 @@ function ReportTable({ reports }) {
                 <div className="inline-block py-2 min-w-full sm:px-6 lg:px-8">
                     <div className="overflow-hidden shadow-md sm:rounded-lg">
                         <table className="min-w-full">
-                            <thead className="bg-gray-50 dark:bg-gray-700">
+                            <thead className="bg-gray-100 dark:bg-gray-700">
                                 <tr>
                                     <th scope="col" className="py-3 px-6 text-xs font-medium tracking-wider text-left text-gray-700 uppercase dark:text-gray-400">
                                         Data
@@ -44,59 +57,13 @@ function ReportTable({ reports }) {
                                         </tr>
                                     )
                                 }
-                                <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                                    <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                        Apple MacBook Pro 17"
-                                    </td>
-                                    <td className="py-4 px-6 text-sm text-gray-500 whitespace-nowrap dark:text-gray-400">
-                                        Sliver
-                                    </td>
-                                    <td className="py-4 px-6 text-sm text-gray-500 whitespace-nowrap dark:text-gray-400">
-                                        Laptop
-                                    </td>
-                                    <td className="py-4 px-6 text-sm text-gray-500 whitespace-nowrap dark:text-gray-400">
-                                        $2999
-                                    </td>
-                                    <td className="py-4 px-6 text-sm font-medium text-right whitespace-nowrap">
-                                        <a href="#" className="text-blue-600 hover:text-blue-900 dark:text-blue-500 dark:hover:underline">Edit</a>
-                                    </td>
-                                </tr>
-
-                                <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                                    <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                        Apple Imac 27"
-                                    </td>
-                                    <td className="py-4 px-6 text-sm text-gray-500 whitespace-nowrap dark:text-gray-400">
-                                        White
-                                    </td>
-                                    <td className="py-4 px-6 text-sm text-gray-500 whitespace-nowrap dark:text-gray-400">
-                                        Desktop Pc
-                                    </td>
-                                    <td className="py-4 px-6 text-sm text-gray-500 whitespace-nowrap dark:text-gray-400">
-                                        $1999
-                                    </td>
-                                    <td className="py-4 px-6 text-sm font-medium text-right whitespace-nowrap">
-                                        <a href="#" className="text-blue-600 hover:text-blue-900 dark:text-blue-500 dark:hover:underline">Edit</a>
-                                    </td>
-                                </tr>
-
-                                <tr className="bg-white dark:bg-gray-800">
-                                    <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                        Apple Magic Mouse 2
-                                    </td>
-                                    <td className="py-4 px-6 text-sm text-gray-500 whitespace-nowrap dark:text-gray-400">
-                                        White
-                                    </td>
-                                    <td className="py-4 px-6 text-sm text-gray-500 whitespace-nowrap dark:text-gray-400">
-                                        Accessories
-                                    </td>
-                                    <td className="py-4 px-6 text-sm text-gray-500 whitespace-nowrap dark:text-gray-400">
-                                        $99
-                                    </td>
-                                    <td className="py-4 px-6 text-sm font-medium text-right whitespace-nowrap">
-                                        <a href="#" className="text-blue-600 hover:text-blue-900 dark:text-blue-500 dark:hover:underline">Edit</a>
-                                    </td>
-                                </tr>
+                                {
+                                    reports.map((report, index) => {
+                                        return <ReportRow index={index} key={index} report={report} />
+                                    }
+                                        
+                                    )
+                                }
                             </tbody>
                         </table>
                     </div>
