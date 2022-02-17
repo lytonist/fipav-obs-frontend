@@ -1,6 +1,37 @@
 import React from 'react';
 
-function ReportRow({ index, report }) {
+function ReportRow({ index, report, setAction, setButton, setReport, toggleModal }) {
+    const editReport = e => {
+        e.preventDefault();
+        // Per modificare il report, tolgo i campi popolati
+        setReport(() => ({
+            ...report,
+            general: {
+                ...report.general,
+                author: report.general.author._id,
+                first_ref: report.general.first_ref._id,
+                second_ref: report.general.second_ref?._id || undefined
+            }
+        }));
+        setAction('edit');
+        setButton('edit');
+    }
+
+    const deleteReport = e => {
+        e.preventDefault();
+        setReport(() => ({
+            ...report,
+            general: {
+                ...report.general,
+                author: report.general.author._id,
+                first_ref: report.general.first_ref._id,
+                second_ref: report.general.second_ref?._id || undefined
+            }
+        }));
+        setAction('delete');
+        toggleModal(e);
+    }
+
     return (
         <tr className={`border-b ${ index % 2 ? 'bg-gray-50 dark:bg-gray-800' : 'bg-white dark:bg-gray-700' } dark:border-gray-600`}>
             <td className="py-4 px-6 text-sm text-gray-500 whitespace-nowrap dark:text-gray-400">{new Date(report.general.date).toLocaleDateString('it-IT')}, {report.general.time}</td>
@@ -10,14 +41,47 @@ function ReportRow({ index, report }) {
                 {`${report.general.first_ref.lastname} ${report.general.first_ref.firstname[0]}.`}
                 {report.general.second_ref && ` - ${report.general.second_ref.lastname} ${report.general.second_ref.firstname[0]}.`}
             </td>
-            <td className="py-4 px-6 text-sm text-gray-500 whitespace-nowrap text-right dark:text-gray-400">
-                <button className='btn-edit'>Edit</button>
+            <td className="py-4 px-6 text-sm text-gray-500 whitespace-nowrap text-right dark:text-gray-400 flex gap-1">
+                <button className='btn-edit' onClick={editReport}>
+                    <svg 
+                        className="w-5 h-5" 
+                        fill="none" 
+                        stroke="currentColor" 
+                        viewBox="0 0 24 24" 
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path 
+                            strokeLinecap="round" 
+                            strokeLinejoin="round" 
+                            strokeWidth="2" 
+                            d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                        >
+                        </path>
+                    </svg>
+                </button>
+                <button className='btn-delete' onClick={deleteReport}>
+                    <svg 
+                        className="w-5 h-5" 
+                        fill="none" 
+                        stroke="currentColor" 
+                        viewBox="0 0 24 24" 
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path 
+                            strokeLinecap="round" 
+                            strokeLinejoin="round"
+                            strokeWidth="2" 
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                        >
+                        </path>
+                    </svg>
+                </button>
             </td>
         </tr>
     )
 }
 
-function ReportTable({ reports }) {
+function ReportTable({ reports, setAction, setButton, setReport, toggleModal }) {
 
     return (
         <div className="flex flex-col">
@@ -59,7 +123,7 @@ function ReportTable({ reports }) {
                                 }
                                 {
                                     reports.map((report, index) => {
-                                        return <ReportRow index={index} key={index} report={report} />
+                                        return <ReportRow index={index} key={index} report={report} setAction={setAction} setButton={setButton} setReport={setReport} toggleModal={toggleModal} />
                                     }
                                         
                                     )

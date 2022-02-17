@@ -10,6 +10,7 @@ import ReportModal from "./reports/ReportModal";
 import ReportTable from "./reports/ReportTable";
 
 const blankReport = {
+    _id: undefined,
     // Dati Generali
     general: {
         author: undefined,
@@ -26,8 +27,8 @@ const blankReport = {
     // Dati Gara
     match: {
         result: '0-0',
-        duration: '',
-        spects: '',
+        duration: 0,
+        spects: 0,
         pts1set: '0-0',
         pts2set: '0-0',
         pts3set: '0-0',
@@ -37,9 +38,9 @@ const blankReport = {
         dur1set: 0,
         dur2set: 0,
         dur3set: 0,
-        dur4set: '',
-        dur5set: '',
-        dur6set: '',
+        dur4set: 0,
+        dur5set: 0,
+        dur6set: 0,
     },
     // Area Immagine
     image: {
@@ -142,17 +143,21 @@ const blankReport = {
 }
 
 function Reports() {
+    const [ action, setAction ] = useState('new');
     const [ button, setButton ] = useState('new');
     const [ error, setError ] = useState(false);
     const [ modal, setModal ] = useState(false);
-    // const [ sendReport, setSendReport ] = useState(false);
     const [ report, setReport ] = useState(blankReport);
     const [ reports, setReports ] = useState([]);
     const [ title, setTitle ] = useTitle();
 
     const handleButton = () => {
         button === 'edit' && setButton('new');
-        button === 'new' && setButton('edit');
+        if (button === 'new') {
+            setReport(blankReport);
+            setAction('new');
+            setButton('edit');
+        }
     }
 
     function toggleModal(e) {
@@ -172,11 +177,29 @@ function Reports() {
         setTitle('Report');
     }, [setTitle]);
 
+    // GET dei report inseriti e ordinamento per data
     useEffect(() => {
         API.get('reports', true).then(res => {
-            res.success && setReports(res.reports);
+            res.success && setReports(res.reports.sort((a, b) => {
+                const date1 = new Date(a.general.date);
+                const date2 = new Date(b.general.date);
+                if (date1 > date2) return 1;
+                if (date1 < date2) return -1;
+                return 0;
+            }));
         });
     }, [setReports]);
+
+    // Al cambiare dei reports, aggiorna l'ordinamento
+    useEffect(() => {
+        setReports(reports.sort((a, b) => {
+            const date1 = new Date(a.general.date);
+            const date2 = new Date(b.general.date);
+            if (date1 > date2) return 1;
+            if (date1 < date2) return -1;
+            return 0;
+        }))
+    }, [reports]);
 
     return (
         <main className="container mx-auto px-5 py-20 lg:px-10 md:py-48">
@@ -194,8 +217,16 @@ function Reports() {
                 )
             }
             { button === 'edit' && <ReportForm report={report} setReport={setReport} toggleModal={toggleModal} /> }
-            { button === 'new' && <ReportTable reports={reports} /> }
-            <ReportModal modal={modal} report={report} setButton={setButton} setError={setError} setReports={setReports} toggleModal={toggleModal} />
+            { button === 'new' && <ReportTable reports={reports} setAction={setAction} setButton={setButton} setReport={setReport} toggleModal={toggleModal} /> }
+            <ReportModal 
+                action={action}
+                modal={modal} 
+                report={report} 
+                setButton={setButton} 
+                setError={setError} 
+                setReports={setReports} 
+                toggleModal={toggleModal} 
+            />
         </main>
     )
 }
