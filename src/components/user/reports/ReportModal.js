@@ -22,10 +22,7 @@ function ReportModal({ action, modal, report, setButton, setError, setReports, t
                 API.update(`reports/${report._id}`, JSON.stringify(report), true)
                     .then(res => {
                         if (res?.success) {
-                            setReports(prevState => {
-                                prevState.filter(report => report._id !== res.report._id);
-                                return [...prevState, res.report];
-                            });
+                            setReports(prevState => [...prevState.filter(report => report._id !== res.report._id), res.report]);
                             setButton('new');
                         } else {
                             setError(res?.msg || 'Qualcosa è andato storto, si prega di riprovare');

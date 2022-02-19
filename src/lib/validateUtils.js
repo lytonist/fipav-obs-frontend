@@ -4,9 +4,32 @@ const validators = {
     allowEmpty: (() => {
         return { success: true }
     }),
+
+    finalSet: (value => {
+        const points = value.split('-');
+        const ptsTeamA = Number(points[0]);
+        const ptsTeamB = Number(points[1]);
+        if (isNaN(ptsTeamA) || isNaN(ptsTeamB)) return { success: false, msg: 'Verificare la correttezza del punteggio inserito' };
+        if (ptsTeamA > ptsTeamB) {
+            if (
+                ptsTeamA < 15 // Il punteggio della squadra vincente è minore di 15
+                || (ptsTeamA - ptsTeamB) < 2 // La differenza dei punti è minore di 2
+                || (ptsTeamA > 15 && (ptsTeamA - ptsTeamB) !== 2) // Il set è finito ai vantaggi ma la differenza dei punti è minore o maggiore di 2
+            ) 
+                return { success: false, msg: 'Verificare la correttezza del punteggio inserito' };
+        } else {
+            if (
+                ptsTeamB < 15 // Il punteggio della squadra vincente è minore di 15
+                || (ptsTeamB - ptsTeamA) < 2 // La differenza dei punti è minore di 2
+                || (ptsTeamB > 15 && (ptsTeamB - ptsTeamA) !== 2) // Il set è finito ai vantaggi ma la differenza dei punti è minore o maggiore di 2
+            ) 
+                return { success: false, msg: 'Verificare la correttezza del punteggio inserito' };
+        }
+        return { success: true }
+    }),
     
     isNumber: (value => {
-        if (value.match(/\d+/)) return { success: true }
+        if (/\d+/.test(value)) return { success: true }
         else return { success: false, msg: 'Non hai inserito un numero valido' }
     }),
 
@@ -22,7 +45,7 @@ const validators = {
     }),
 
     notEmpty: (value => {
-        if (value) return { success: true }
+        if (`${value}`) return { success: true }
         else return { success: false, msg: 'Il campo non può essere vuoto' }
     }),
 

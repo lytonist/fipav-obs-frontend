@@ -28,8 +28,8 @@ const checks = [
     { field: 'pts2set', tests: ['notEmpty', 'standardSet']},
     { field: 'pts3set', tests: ['notEmpty', 'standardSet'] },
     { field: 'pts4set', tests: ['allowEmpty', 'standardSet'] },
-    { field: 'pts5set', tests: ['allowEmpty', 'standardSet'] },
-    { field: 'pts6set', tests: ['allowEmpty', 'standardSet'] },
+    { field: 'pts5set', tests: ['allowEmpty', 'finalSet'] },
+    { field: 'pts6set', tests: ['allowEmpty', 'finalSet'] },
     { field: 'dur1set', tests: ['notEmpty', 'isNumber'] },
     { field: 'dur2set', tests: ['notEmpty', 'isNumber'] },
     { field: 'dur3set', tests: ['notEmpty', 'isNumber'] },
@@ -124,11 +124,10 @@ const checks = [
     { field: 'finalvote2ref', tests: ['notEmpty'] }
 ];
 
-function checkInput(e) {
-    const inputId = e.currentTarget.id;
-    const value = e.currentTarget.value;
-    const { tests } = checks.find(el => el.field === inputId);
-    return validateInput(value, tests);
+function checkInput(inputId, value) {
+    const inputCheck = checks.find(el => el.field === inputId);
+    if (!inputCheck) return { success: true };
+    return validateInput(value, inputCheck.tests);
 }
 
 function confirmBlur(test, inputId, setError, setStyle) {
@@ -145,6 +144,19 @@ function confirmBlur(test, inputId, setError, setStyle) {
             [inputId]: 'form-input-danger'
         }));
     }
+}
+
+function finalValidate(groupArea, setError, setStyle, setTesting) {
+    Object.entries(groupArea).forEach(([key, value]) => {
+        const test = checkInput(key, value);
+        confirmBlur(test, key, setError, setStyle);
+        setTesting(prevState => ({
+            ...prevState,
+            validationResults: [
+                ...prevState.validationResults, test.success
+            ]
+        }));
+    });
 }
 
 // Controlled Inputs
@@ -239,7 +251,7 @@ const RefereesSelect = ({id, value, handleChange, handleBlur, referees, classLis
         )
 }
 
-const GeneralArea = ({ report, setReport }) => {
+const GeneralArea = ({ report, setReport, setTesting, testing }) => {
     const [ error, setError ] = useState();
     const [ style, setStyle ] = useState({
         match_num: undefined, 
@@ -257,9 +269,14 @@ const GeneralArea = ({ report, setReport }) => {
 
     // Validating input
     function handleBlur(e) {
-        const test = checkInput(e);
         const inputId = e.currentTarget.id;
+        const value = e.currentTarget.value;
+        const test = checkInput(inputId, value);
         confirmBlur(test, inputId, setError, setStyle);
+    }
+
+    const handleChange = e => {
+        manageInput(e, 'general', setReport);
     }
 
     useEffect(() => {
@@ -269,8 +286,8 @@ const GeneralArea = ({ report, setReport }) => {
             });
     }, [setReferees]);
 
+    // Setta l'autore del rapporto in bianco sull'attuale utente
     useEffect(() => {
-        // Setta l'autore del rapporto in bianco sull'attuale utente
         setReport(prevState => ({
             ...prevState,
             general: {
@@ -279,10 +296,13 @@ const GeneralArea = ({ report, setReport }) => {
             }
         }))
     }, [setReport, user._id]);
-    
-    const handleChange = e => {
-        manageInput(e, 'general', setReport);
-    }
+
+    // Effettua tutti i test di validazione
+    useEffect(() => {
+        if (testing.status) {
+            finalValidate(report.general, setError, setStyle, setTesting);
+        }
+    }, [report.general, setTesting, testing]);
 
     return (
         <div className="mb-2 py-2 min-w-full px-6 lg:px-8 bg-gray-100 shadow-md sm:rounded-lg">
@@ -436,8 +456,8 @@ const GeneralArea = ({ report, setReport }) => {
     )
 }
 
-const MatchArea = ({ report, setReport }) => {
-    const [error, setError] = useState();
+const MatchArea = ({ report, setReport, setTesting, testing }) => {
+    const [ error, setError ] = useState();
     const [ style, setStyle ] = useState({
         result: undefined, 
         duration: undefined, 
@@ -458,14 +478,41 @@ const MatchArea = ({ report, setReport }) => {
 
     // Validating input
     function handleBlur(e) {
-        const test = checkInput(e);
         const inputId = e.currentTarget.id;
+        const value = e.currentTarget.value;
+        const test = checkInput(inputId, value);
         confirmBlur(test, inputId, setError, setStyle);
+    }
+
+    function verifyresult({ result, pts1set, pts2set, pts3set, pts4set, pts5set }, setError) {
+        const [ resultA, resultB ] = result.split('-');
+        const setTotals = Number(resultA) + Number(resultB);
+        const points = [pts1set, pts2set, pts3set, pts4set, pts5set].filter(el => el);
+        if (points.length === setTotals) { // Il numero dei set coincide con il risultato inserito
+            if (Number(resultA) !== points.filter(value => Number(value.split('-')[0]) > Number(value.split('-')[1])).length) return false;
+            if (Number(resultB) !== points.filter(value => Number(value.split('-')[1]) > Number(value.split('-')[0])).length) return false;
+            return true;
+        } else { // Manca qualche risultato
+            return false;
+        }
     }
 
     const handleChange = e => {
         manageInput(e, 'match', setReport);
     }
+
+    // Al click effettua tutti i test di validazione
+    useEffect(() => {
+        if (testing.status) {
+            finalValidate(report.match, setError, setStyle, setTesting);
+            const testResult = verifyresult(report.match, setError);
+            setTesting(prevState => ({
+                ...prevState,
+                validationResults: [...prevState.validationResults, testResult]
+            }));
+            if (!testResult) setError('Verificare il risultato inserito');
+        }
+    }, [report.match, setError, setTesting, testing]);
     
     return (
         <div className="mb-2 py-2 min-w-full px-6 lg:px-8 bg-gray-100 shadow-md sm:rounded-lg">
@@ -545,7 +592,7 @@ const MatchArea = ({ report, setReport }) => {
     )
 }
 
-const ImageArea = ({ report, setReport }) => {
+const ImageArea = ({ report, setReport, setTesting, testing }) => {
     const [ error, setError ] = useState();
     const [ style, setStyle ] = useState({
         aspect1ref: undefined, 
@@ -567,10 +614,18 @@ const ImageArea = ({ report, setReport }) => {
 
     // Validating input
     function handleBlur(e) {
-        const test = checkInput(e);
         const inputId = e.currentTarget.id;
+        const value = e.currentTarget.value;
+        const test = checkInput(inputId, value);
         confirmBlur(test, inputId, setError, setStyle);
     }
+
+    // Effettua tutti i test di validazione
+    useEffect(() => {
+        if (testing.status) {
+            finalValidate(report.image, setError, setStyle, setTesting);
+        }
+    }, [report.image, setTesting, testing]);
 
     return (
         <div className="mb-2 py-2 min-w-full px-6 lg:px-8 bg-gray-100 shadow-md sm:rounded-lg">
@@ -697,7 +752,7 @@ const ImageArea = ({ report, setReport }) => {
     )
 }
 
-const TechnicalArea = ({ report, setReport }) => {
+const TechnicalArea = ({ report, setReport, setTesting, testing }) => {
     const [ error, setError ] = useState();
     const [ style, setStyle ] = useState({
         complexity: undefined, 
@@ -755,10 +810,18 @@ const TechnicalArea = ({ report, setReport }) => {
 
     // Validating input
     function handleBlur(e) {
-        const test = checkInput(e);
         const inputId = e.currentTarget.id;
+        const value = e.currentTarget.value;
+        const test = checkInput(inputId, value);
         confirmBlur(test, inputId, setError, setStyle);
     }
+
+    // Effettua tutti i test di validazione
+    useEffect(() => {
+        if (testing.status) {
+            finalValidate(report.technical, setError, setStyle, setTesting);
+        }
+    }, [report.technical, setTesting, testing]);
     
     return (
         <div className="mb-2 py-2 min-w-full px-6 lg:px-8 bg-gray-100 shadow-md sm:rounded-lg">
@@ -1283,7 +1346,7 @@ const TechnicalArea = ({ report, setReport }) => {
     )
 }
 
-const RelArea = ({ report, setReport }) => {
+const RelArea = ({ report, setReport, setTesting, testing }) => {
     const [ error, setError ] = useState();
     const [ style, setStyle ] = useState({
         gest_difficulty: undefined, 
@@ -1300,10 +1363,18 @@ const RelArea = ({ report, setReport }) => {
 
     // Validating input
     function handleBlur(e) {
-        const test = checkInput(e);
         const inputId = e.currentTarget.id;
+        const value = e.currentTarget.value;
+        const test = checkInput(inputId, value);
         confirmBlur(test, inputId, setError, setStyle);
     }
+
+    // Effettua tutti i test di validazione
+    useEffect(() => {
+        if (testing.status) {
+            finalValidate(report.relational, setError, setStyle, setTesting);
+        }
+    }, [report.relational, setTesting, testing]);
 
     return (
         <div className="mb-2 py-2 min-w-full px-6 lg:px-8 bg-gray-100 shadow-md sm:rounded-lg">
@@ -1383,7 +1454,7 @@ const RelArea = ({ report, setReport }) => {
     )
 }
 
-const DisciplineArea = ({ report, setReport }) => {
+const DisciplineArea = ({ report, setReport, setTesting, testing }) => {
     const [ error, setError ] = useState();
     const [ style, setStyle ] = useState({
         gest_discipline: undefined, 
@@ -1405,10 +1476,18 @@ const DisciplineArea = ({ report, setReport }) => {
 
     // Validating input
     function handleBlur(e) {
-        const test = checkInput(e);
         const inputId = e.currentTarget.id;
+        const value = e.currentTarget.value;
+        const test = checkInput(inputId, value);
         confirmBlur(test, inputId, setError, setStyle);
     }
+
+    // Effettua tutti i test di validazione
+    useEffect(() => {
+        if (testing.status) {
+            finalValidate(report.discipline, setError, setStyle, setTesting);
+        }
+    }, [report.discipline, setTesting, testing]);
 
     return (
         <div className="mb-2 py-2 min-w-full px-6 lg:px-8 bg-gray-100 shadow-md sm:rounded-lg">
@@ -1545,7 +1624,7 @@ const DisciplineArea = ({ report, setReport }) => {
     )
 }
 
-const InterviewArea = ({ report, setReport }) => {
+const InterviewArea = ({ report, setReport, setTesting, testing }) => {
     const [ error, setError ] = useState();
     const [ style, setStyle ] = useState({
         interview1ref: undefined, 
@@ -1559,10 +1638,18 @@ const InterviewArea = ({ report, setReport }) => {
 
     // Validating input
     function handleBlur(e) {
-        const test = checkInput(e);
         const inputId = e.currentTarget.id;
+        const value = e.currentTarget.value;
+        const test = checkInput(inputId, value);
         confirmBlur(test, inputId, setError, setStyle);
     }
+
+    // Effettua tutti i test di validazione
+    useEffect(() => {
+        if (testing.status) {
+            finalValidate(report.interview, setError, setStyle, setTesting);
+        }
+    }, [report.interview, setTesting, testing]);
 
     return (
         <div className="mb-2 py-2 min-w-full px-6 lg:px-8 bg-gray-100 shadow-md sm:rounded-lg">
@@ -1621,7 +1708,7 @@ const InterviewArea = ({ report, setReport }) => {
     )
 }
 
-const EventsArea = ({ report, setReport }) => {
+const EventsArea = ({ report, setReport, setTesting, testing }) => {
     const [ error, setError ] = useState();
     const [ style, setStyle ] = useState({
         finalvote1ref: undefined, 
@@ -1634,10 +1721,18 @@ const EventsArea = ({ report, setReport }) => {
 
     // Validating input
     function handleBlur(e) {
-        const test = checkInput(e);
         const inputId = e.currentTarget.id;
+        const value = e.currentTarget.value;
+        const test = checkInput(inputId, value);
         confirmBlur(test, inputId, setError, setStyle);
     }
+
+    // Effettua tutti i test di validazione
+    useEffect(() => {
+        if (testing.status) {
+            finalValidate(report.events, setError, setStyle, setTesting);
+        }
+    }, [report.events, setTesting, testing]);
 
     return (
         <div className="mb-2 py-2 min-w-full px-6 lg:px-8 bg-gray-100 shadow-md sm:rounded-lg">
@@ -1683,22 +1778,41 @@ const EventsArea = ({ report, setReport }) => {
 }
 
 function ReportForm ({report, setReport, toggleModal}) {
+    const [ testing, setTesting ] = useState({ status: false, validationResults: [] });
+
+    const formSending = e => {
+        e.preventDefault();
+        window.scroll(0, 0)
+        setTesting({ status: true, validationResults: [] });
+    }
+
+    // Verifica dei test effettuati
+    useEffect(() => {
+        const { status, validationResults } = testing;
+        if (status && validationResults.length > 105) { // Allora tutti i test sono stati effettuati
+            setTesting(prevState => ({
+                ...prevState,
+                status: false
+            }));
+            if (validationResults.every(el => el === true)) toggleModal();
+        }
+    }, [testing, setTesting, toggleModal]);
 
     return (
         <div className="container flex">
             <form>
-                <GeneralArea    report={ report } setReport={ setReport} />
-                <MatchArea      report={ report } setReport={ setReport} />
-                <ImageArea      report={ report } setReport={ setReport} />
-                <TechnicalArea  report={ report } setReport={ setReport} />
-                <RelArea        report={ report } setReport={ setReport} />
-                <DisciplineArea report={ report } setReport={ setReport} />
-                <InterviewArea  report={ report } setReport={ setReport} />
-                <EventsArea     report={ report } setReport={ setReport} />
+                <GeneralArea    report={ report } setReport={ setReport} setTesting={setTesting} testing={testing} />
+                <MatchArea      report={ report } setReport={ setReport} setTesting={setTesting} testing={testing} />
+                <ImageArea      report={ report } setReport={ setReport} setTesting={setTesting} testing={testing} />
+                <TechnicalArea  report={ report } setReport={ setReport} setTesting={setTesting} testing={testing} />
+                <RelArea        report={ report } setReport={ setReport} setTesting={setTesting} testing={testing} />
+                <DisciplineArea report={ report } setReport={ setReport} setTesting={setTesting} testing={testing} />
+                <InterviewArea  report={ report } setReport={ setReport} setTesting={setTesting} testing={testing} />
+                <EventsArea     report={ report } setReport={ setReport} setTesting={setTesting} testing={testing} />
                 <button 
                     className="btn-default mb-4" 
                     data-modal-toggle="reportModal"
-                    onClick={toggleModal}
+                    onClick={formSending}
                 >
                     Invia Report
                 </button>

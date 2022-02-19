@@ -161,7 +161,7 @@ function Reports() {
     }
 
     function toggleModal(e) {
-        e.preventDefault();
+        e?.preventDefault();
         setModal(!modal);
         if (modal) {
             document.querySelector('[modal-backdrop]').remove();
