@@ -1,6 +1,10 @@
 import React from 'react';
+import { serviceProvider as API } from '../../../API/api';
+import { useAuth } from '../../../contexts/userContext';
 
-function ReportRow({ index, report, setAction, setButton, setReport, toggleModal }) {
+function ReportRow({ allReports, index, report, setAction, setButton, setReport, setReports, toggleModal }) {
+    const [ user ] = useAuth();
+
     const editReport = e => {
         e.preventDefault();
         // Per modificare il report, tolgo i campi popolati
@@ -32,6 +36,19 @@ function ReportRow({ index, report, setAction, setButton, setReport, toggleModal
         toggleModal(e);
     }
 
+    const handleValidation = e => {
+        e.preventDefault();
+        const valid = { valid: !report.valid }
+        API.update(`reports/${report._id}`, JSON.stringify(valid), true)
+            .then(res => {
+                if (res?.success) {
+                    setReports(prevState => {
+                        return [...prevState.filter(report => report._id !== res.report._id), res.report].sort((a, b) => new Date(a.general.date) - new Date(b.general.date))});
+                }
+            })
+            .catch(err => console.error(err));
+    }
+
     return (
         <tr className={`border-b ${ index % 2 ? 'bg-gray-50 dark:bg-gray-800' : 'bg-white dark:bg-gray-700' } dark:border-gray-600`}>
             <td className="py-4 px-6 text-sm text-gray-500 whitespace-nowrap dark:text-gray-400">{new Date(report.general.date).toLocaleDateString('it-IT')}, {report.general.time}</td>
@@ -41,8 +58,11 @@ function ReportRow({ index, report, setAction, setButton, setReport, toggleModal
                 {`${report.general.first_ref.lastname} ${report.general.first_ref.firstname[0]}.`}
                 {report.general.second_ref && ` - ${report.general.second_ref.lastname} ${report.general.second_ref.firstname[0]}.`}
             </td>
-            <td className="py-4 px-6 text-sm text-gray-500 whitespace-nowrap text-right dark:text-gray-400 flex gap-1">
-                <button className='btn-edit' onClick={editReport}>
+            {
+                allReports && <td className="py-4 px-6 text-sm text-gray-500 whitespace-nowrap dark:text-gray-400">{report.general.author.lastname} {report.general.author.firstname[0]}.</td>
+            }
+            <td className="py-4 px-6 text-sm text-gray-500 whitespace-nowrap dark:text-gray-400 flex gap-1">
+                <button className='btn-edit' title="Modifica" onClick={editReport} disabled={report.valid}>
                     <svg 
                         className="w-5 h-5" 
                         fill="none" 
@@ -59,7 +79,7 @@ function ReportRow({ index, report, setAction, setButton, setReport, toggleModal
                         </path>
                     </svg>
                 </button>
-                <button className='btn-delete' onClick={deleteReport}>
+                <button className='btn-delete' title="Elimina" onClick={deleteReport}>
                     <svg 
                         className="w-5 h-5" 
                         fill="none" 
@@ -76,12 +96,37 @@ function ReportRow({ index, report, setAction, setButton, setReport, toggleModal
                         </path>
                     </svg>
                 </button>
+                {
+                    user.admin && (
+                        <button 
+                            className={ report.valid ? "btn-confirm" : "btn-edit-outline" } 
+                            title={ report.valid ? "Annulla omologazione" : "Omologa"}
+                            onClick={ handleValidation }
+                        >
+                            <svg 
+                                className="w-6 h-6" 
+                                fill="none" 
+                                stroke="currentColor" 
+                                viewBox="0 0 24 24" 
+                                xmlns="http://www.w3.org/2000/svg"
+                            >
+                                <path 
+                                    strokeLinecap="round" 
+                                    strokeLinejoin="round" 
+                                    strokeWidth="2" 
+                                    d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
+                                >
+                                </path>
+                            </svg>
+                        </button>
+                    )
+                }
             </td>
         </tr>
     )
 }
 
-function ReportTable({ reports, setAction, setButton, setReport, toggleModal }) {
+function ReportTable({ allReports, reports, setAction, setButton, setReport, setReports, toggleModal }) {
 
     return (
         <div className="flex flex-col">
@@ -103,6 +148,13 @@ function ReportTable({ reports, setAction, setButton, setReport, toggleModal }) 
                                     <th scope="col" className="py-3 px-6 text-xs font-medium tracking-wider text-left text-gray-700 uppercase dark:text-gray-400">
                                         Arbitri
                                     </th>
+                                    {
+                                        allReports && (
+                                            <th scope="col" className="py-3 px-6 text-xs font-medium tracking-wider text-left text-gray-700 uppercase dark:text-gray-400">
+                                                Osservatore
+                                            </th>
+                                        )
+                                    }
                                     <th scope="col" className="relative py-3 px-6">
                                         <span className="sr-only">Edit</span>
                                     </th>
@@ -122,9 +174,19 @@ function ReportTable({ reports, setAction, setButton, setReport, toggleModal }) 
                                     )
                                 }
                                 {
-                                    reports.map((report, index) => {
-                                        return <ReportRow index={index} key={index} report={report} setAction={setAction} setButton={setButton} setReport={setReport} toggleModal={toggleModal} />
-                                    }
+                                    reports.map((report, index) => (
+                                        <ReportRow 
+                                            index={index} 
+                                            key={index} 
+                                            allReports={allReports} 
+                                            report={report} 
+                                            setAction={setAction} 
+                                            setButton={setButton} 
+                                            setReport={setReport} 
+                                            setReports={setReports} 
+                                            toggleModal={toggleModal} 
+                                        />
+                                        )
                                         
                                     )
                                 }

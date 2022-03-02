@@ -253,7 +253,10 @@ const RefereesSelect = ({id, value, handleChange, handleBlur, referees, classLis
 
 const GeneralArea = ({ report, setReport, setTesting, testing }) => {
     const [ error, setError ] = useState();
+    const [ users, setUsers ] = useState([]);
+    const [ referees, setReferees ] = useState([]);
     const [ style, setStyle ] = useState({
+        author: undefined,
         match_num: undefined, 
         series: undefined, 
         date: undefined,
@@ -264,7 +267,6 @@ const GeneralArea = ({ report, setReport, setTesting, testing }) => {
         second_ref: undefined,
         scorer: undefined
     });
-    const [ referees, setReferees ] = useState([]);
     const [ user ] = useAuth();
 
     // Validating input
@@ -279,6 +281,13 @@ const GeneralArea = ({ report, setReport, setTesting, testing }) => {
         manageInput(e, 'general', setReport);
     }
 
+    const handleToggle = () => {
+        setReport(prevState => ({
+            ...prevState,
+            valid: !prevState.valid
+        }));
+    }
+
     useEffect(() => {
         API.get('referees', true)
             .then(res => {
@@ -286,16 +295,12 @@ const GeneralArea = ({ report, setReport, setTesting, testing }) => {
             });
     }, [setReferees]);
 
-    // Setta l'autore del rapporto in bianco sull'attuale utente
     useEffect(() => {
-        setReport(prevState => ({
-            ...prevState,
-            general: {
-                ...prevState.general,
-                author: user._id
-            }
-        }))
-    }, [setReport, user._id]);
+        API.get('users', true)
+            .then(res => {
+                res.success && setUsers(res.users);
+            });
+    }, [setUsers]);
 
     // Effettua tutti i test di validazione
     useEffect(() => {
@@ -313,6 +318,40 @@ const GeneralArea = ({ report, setReport, setTesting, testing }) => {
                 error && (
                     <div className="danger-alert dark:bg-red-200 dark:text-red-800" role="alert">
                         <span className="font-medium">Attenzione!</span> { error }.
+                    </div>
+                )
+            }
+            {
+                user.admin && (
+                    <div className="mb-2 grid grid-cols-2 gap-4 items-center">
+                        <div>
+                            <label htmlFor="author" className="form-label dark:text-gray-300">Osservatore</label>
+                            <select 
+                                type="text"
+                                value={ report.general.author }
+                                onChange={ handleChange } 
+                                onBlur={ handleBlur }
+                                className={`block p-2 w-full ${style.author || 'form-input'}`} 
+                            >
+                                {
+                                    users.map( (user, i) => <option key={`user-${i}`} value={user._id}>{user.lastname} {user.firstname[0]}.</option> )
+                                }
+                            </select>
+                        </div>
+                        <div className="mt-6">
+                            <label htmlFor="all-reports" className="flex relative items-center cursor-pointer">
+                                <input 
+                                    type="checkbox" 
+                                    id="all-reports" 
+                                    className="sr-only" 
+                                    checked={ report.valid }
+                                    value={ report.valid }
+                                    onChange={ handleToggle }
+                                />
+                                <div className="w-11 h-6 bg-gray-200 rounded-full border border-gray-200 toggle-bg dark:bg-gray-700 dark:border-gray-600"></div>
+                                <span className="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300">Omologa il Report</span>
+                            </label>
+                        </div>
                     </div>
                 )
             }
