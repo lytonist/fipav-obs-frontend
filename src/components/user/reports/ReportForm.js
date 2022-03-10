@@ -903,7 +903,7 @@ const TechnicalArea = ({ report, setReport, setTesting, testing }) => {
                     value={ report.technical.tech2ref } 
                     handleChange={ handleChange }
                     handleBlur={ handleBlur }
-                    classList={`block p-2 w-full ${style.tech1ref || 'form-select'} text-sm`}
+                    classList={`block p-2 w-full ${style.tech2ref || 'form-select'} text-sm`}
                 />
             </div>
             <div className="mb-2">

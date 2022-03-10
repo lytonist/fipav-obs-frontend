@@ -8,6 +8,7 @@ import { useTitle } from '../../contexts/titleContext';
 // Components
 import ReportForm from "./reports/ReportForm";
 import ReportModal from "./reports/ReportModal";
+import ReportPreview from "./reports/ReportPreview";
 import ReportTable from "./reports/ReportTable";
 
 function Reports() {
@@ -148,23 +149,30 @@ function Reports() {
     const [ action, setAction ] = useState('new');
     const [ allReports, setallReports ] = useState(false);
     const [ button, setButton ] = useState('new');
+    const [ completeReport, setCompleteReport ] = useState(undefined);
     const [ error, setError ] = useState(false);
     const [ modal, setModal ] = useState(false);
     const [ report, setReport ] = useState(blankReport);
     const [ reports, setReports ] = useState([]);
+    const [ showReferee, setShowReferee ] = useState('1st');
     const [ title, setTitle ] = useTitle();
 
     const handleButton = () => {
-        button === 'edit' && setButton('new');
         if (button === 'new') {
             setReport(blankReport);
             setAction('new');
             setButton('edit');
+        } else {
+            setButton('new');
         }
     }
 
     const toggleButton = () => {
         setallReports(!allReports);
+    }
+
+    const changeShow = e => {
+        setShowReferee(e.currentTarget.value);
     }
 
     function toggleModal(e) {
@@ -208,7 +216,7 @@ function Reports() {
     }, [reports]);
 
     return (
-        <main className="container mx-auto h-screen px-5 py-20 lg:px-10 md:py-48">
+        <main className="container mx-auto min-h-screen px-5 py-20 lg:px-10 md:py-48">
             <div className="flex gap-2 items-center">
                 <button
                     className="btn-default mb-4"
@@ -234,6 +242,20 @@ function Reports() {
                         </div>
                     )
                 }
+                {
+                    button === 'preview' && (
+                        <div className="mb-4">
+                            <select
+                                value={showReferee}
+                                onChange={changeShow}
+                                className="block p-2 form-input w-32"
+                            >
+                                { completeReport.general.first_ref && <option value='1st'>Primo Arbitro</option> }
+                                { completeReport.general.second_ref && <option value='2nd'>Secondo Arbitro</option> }
+                            </select>
+                        </div>
+                    )
+                }
                 
             </div>
             
@@ -245,7 +267,8 @@ function Reports() {
                 )
             }
             { button === 'edit' && <ReportForm report={report} setReport={setReport} toggleModal={toggleModal} /> }
-            { button === 'new' && <ReportTable allReports={allReports} reports={reports} setAction={setAction} setButton={setButton} setReport={setReport} setReports={setReports} toggleModal={toggleModal} /> }
+            { button === 'new' && <ReportTable allReports={allReports} reports={reports} setAction={setAction} setButton={setButton} setCompleteReport={setCompleteReport} setReport={setReport} setReports={setReports} toggleModal={toggleModal} /> }
+            { button === 'preview' && <ReportPreview report={completeReport} showReferee={showReferee} /> }
             <ReportModal 
                 action={action}
                 modal={modal} 

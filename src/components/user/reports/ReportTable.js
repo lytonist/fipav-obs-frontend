@@ -2,7 +2,7 @@ import React from 'react';
 import { serviceProvider as API } from '../../../API/api';
 import { useAuth } from '../../../contexts/userContext';
 
-function ReportRow({ allReports, index, report, setAction, setButton, setReport, setReports, toggleModal }) {
+function ReportRow({ allReports, index, report, setAction, setButton, setCompleteReport, setReport, setReports, toggleModal }) {
     const [ user ] = useAuth();
 
     const editReport = e => {
@@ -36,6 +36,11 @@ function ReportRow({ allReports, index, report, setAction, setButton, setReport,
         toggleModal(e);
     }
 
+    const showPreview = () => {
+        setCompleteReport(report);
+        setButton('preview');
+    }
+
     const handleValidation = e => {
         e.preventDefault();
         const valid = { valid: !report.valid }
@@ -62,7 +67,12 @@ function ReportRow({ allReports, index, report, setAction, setButton, setReport,
                 allReports && <td className="py-4 px-6 text-sm text-gray-500 whitespace-nowrap dark:text-gray-400">{report.general.author.lastname} {report.general.author.firstname[0]}.</td>
             }
             <td className="py-4 px-6 text-sm text-gray-500 whitespace-nowrap dark:text-gray-400 flex gap-1">
-                <button className='btn-edit' title="Modifica" onClick={editReport} disabled={report.valid}>
+                <button 
+                    className={ report.valid ? 'btn-edit-disabled' : 'btn-edit' } 
+                    title="Modifica" 
+                    onClick={editReport} 
+                    disabled={report.valid}
+                >
                     <svg 
                         className="w-5 h-5" 
                         fill="none" 
@@ -75,6 +85,27 @@ function ReportRow({ allReports, index, report, setAction, setButton, setReport,
                             strokeLinejoin="round" 
                             strokeWidth="2" 
                             d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                        >
+                        </path>
+                    </svg>
+                </button>
+                <button
+                    className="btn-default"
+                    title="Anteprima admin"
+                    onClick={ showPreview }
+                >
+                    <svg 
+                        className="w-6 h-6" 
+                        fill="none" 
+                        stroke="currentColor" 
+                        viewBox="0 0 24 24" 
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path 
+                            strokeLinecap="round" 
+                            strokeLinejoin="round" 
+                            strokeWidth="2" 
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                         >
                         </path>
                     </svg>
@@ -126,7 +157,7 @@ function ReportRow({ allReports, index, report, setAction, setButton, setReport,
     )
 }
 
-function ReportTable({ allReports, reports, setAction, setButton, setReport, setReports, toggleModal }) {
+function ReportTable({ allReports, reports, setAction, setButton, setCompleteReport, setReport, setReports, toggleModal }) {
 
     return (
         <div className="flex flex-col">
@@ -182,6 +213,7 @@ function ReportTable({ allReports, reports, setAction, setButton, setReport, set
                                             report={report} 
                                             setAction={setAction} 
                                             setButton={setButton} 
+                                            setCompleteReport={setCompleteReport}
                                             setReport={setReport} 
                                             setReports={setReports} 
                                             toggleModal={toggleModal} 
