@@ -296,11 +296,12 @@ const GeneralArea = ({ report, setReport, setTesting, testing }) => {
     }, [setReferees]);
 
     useEffect(() => {
-        API.get('users', true)
-            .then(res => {
-                res.success && setUsers(res.users);
-            });
-    }, [setUsers]);
+        user.admin && 
+            API.get('users', true)
+                .then(res => {
+                    res.success && setUsers(res.users);
+                });
+    }, [setUsers, user.admin]);
 
     // Effettua tutti i test di validazione
     useEffect(() => {
@@ -1545,10 +1546,10 @@ const DisciplineArea = ({ report, setReport, setTesting, testing }) => {
                     <label htmlFor="gest_discipline" className="form-label dark:text-gray-300">Complessità disciplinare</label>
                     <DifficOptions
                         id="gest_discipline"
-                        value={ report.discipline.gest_difficulty }
+                        value={ report.discipline.gest_discipline }
                         handleChange={ handleChange } 
                         handleBlur={ handleBlur }
-                        classList={`block p-2 w-full ${style.gest_difficulty || 'form-select'} text-sm`}
+                        classList={`block p-2 w-full ${style.gest_discipline || 'form-select'} text-sm`}
                     />
                 </div>
             </div>
@@ -1717,8 +1718,8 @@ const InterviewArea = ({ report, setReport, setTesting, testing }) => {
                     className={`block p-2 w-full ${style.interview1ref || 'form-select'} text-sm`}
                 >
                     <option value="2">Nella norma</option>
-                    <option value="1">Zelante e/o polemico</option>
-                    <option value="0">Disattento e/o distratto</option>
+                    <option value="1">Disattento e/o distratto</option>
+                    <option value="0">Zelante e/o polemico</option>
                 </select>
                 <select 
                     id="interview2ref" 
@@ -1728,8 +1729,8 @@ const InterviewArea = ({ report, setReport, setTesting, testing }) => {
                     className={`block p-2 w-full ${style.interview2ref || 'form-select'} text-sm`}
                 >
                     <option value="2">Nella norma</option>
-                    <option value="1">Zelante e/o polemico</option>
-                    <option value="0">Disattento e/o distratto</option>
+                    <option value="1">Disattento e/o distratto</option>
+                    <option value="0">Zelante e/o polemico</option>
                 </select>
             </div>
             <div className="mb-4">

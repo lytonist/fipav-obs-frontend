@@ -57,7 +57,7 @@ function ReportModal({ action, modal, report, setButton, setError, setReports, t
                     {/* <!-- Modal body --> */}
                     <div className="p-6 space-y-6">
                         <p className="text-base leading-relaxed text-gray-500 dark:text-gray-400">
-                            Confermi la correttezza dei dati e l'inserimento del report?
+                            { action === "delete" ? "Confermi di voler eliminare il report?" : "Confermi la correttezza dei dati e l'inserimento del report?" }
                         </p>
                     </div>
                     {/* <!-- Modal footer --> */}

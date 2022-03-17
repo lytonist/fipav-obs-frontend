@@ -34,7 +34,7 @@ const validators = {
     }),
 
     isTime: (value => {
-        if (value.match(/(0[0-9]|1[0-9]|2[1-3]):([0-5][0-9])/)) return { success: true }
+        if (value.match(/(0[0-9]|1[0-9]|2[0-3]):([0-5][0-9])/)) return { success: true }
         else return { success: false, msg: 'Non hai inserito un orario valido' }
     }),
 

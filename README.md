@@ -1,3 +1,7 @@
+## Cose da fare
+
+Filtrare i report per data o altro, accesso arbitri
+
 ## Available Scripts
 
 In the project directory, you can run:

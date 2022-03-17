@@ -110,7 +110,12 @@ function ReportRow({ allReports, index, report, setAction, setButton, setComplet
                         </path>
                     </svg>
                 </button>
-                <button className='btn-delete' title="Elimina" onClick={deleteReport}>
+                <button 
+                    className={ report.valid ? "btn-delete-disabled" : "btn-delete" } 
+                    title="Elimina" 
+                    onClick={deleteReport}
+                    disabled={report.valid}
+                >
                     <svg 
                         className="w-5 h-5" 
                         fill="none" 

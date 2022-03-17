@@ -69,6 +69,10 @@ h1, h2, h3, h4, h5, h6 {
   @apply text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm py-2 px-3 text-center;
 }
 
+.btn-delete-disabled {
+  @apply text-red-700 border border-red-700 font-medium rounded-lg text-sm py-2 px-3 text-center cursor-not-allowed;
+}
+
 /* Tables */
 .table-th {
   @apply text-xs font-medium px-6 py-3 text-left uppercase tracking-wider;
@@ -106,4 +110,17 @@ h1, h2, h3, h4, h5, h6 {
 /* Alerts */
 .danger-alert {
   @apply p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg
+}
+
+/* Text */
+.penalty {
+  @apply text-red-600
+}
+
+.bonus {
+  @apply text-green-500
+}
+
+.value {
+  @apply text-yellow-400
 }
