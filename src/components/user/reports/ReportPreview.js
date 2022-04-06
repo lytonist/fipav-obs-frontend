@@ -26,7 +26,7 @@ const calcErrors = ({std, sev}) => {
     }
 }
 
-function ReportPreview({ report, showReferee }) {
+function ReportPreview({ report, restricted, showReferee }) {
 
     const [ user ] = useAuth();
     const [ vote, setVote ] = useState(96);
@@ -215,7 +215,7 @@ function ReportPreview({ report, showReferee }) {
         };
 
         const errors = showReferee === '1st' ? calcErrors(errorslist1ref) : calcErrors(errorslist2ref);
-
+        console.log((errors.sev * (-0.4 * 100) / 100) <= 0)
         setResults(prevState => ({
             aspect: {
                 ...prevState.aspect,
@@ -243,15 +243,15 @@ function ReportPreview({ report, showReferee }) {
             },
             errors_1st: {
                 ...prevState.errors_1st,
-                result: errors.std * (prevState.errors_1st.table[0] * 100) / 100
+                result: errors.std * (Number(prevState.errors_1st.table[0]) * 100) / 100
             },
             errors_2nd: {
                 ...prevState.errors_2nd,
-                result: errors.med * (prevState.errors_2nd.table[1] * 100) / 100
+                result: errors.med * (Number(prevState.errors_2nd.table[1]) * 100) / 100
             },
             errors_3rd: {
                 ...prevState.errors_3rd,
-                result: errors.sev * (prevState.errors_3rd.table[2] * 100) / 100
+                result: errors.sev * (Number(prevState.errors_3rd.table[2]) * 100) / 100
             },
             collab: {
                 ...prevState.collab,
@@ -290,16 +290,23 @@ function ReportPreview({ report, showReferee }) {
 
     return (
         <div className="container">
-            <div className="mb-2 p-2 min-w-full bg-gray-100 text-center shadow-md sm:rounded-lg">
+            <div className="mb-2 p-2 min-w-full border border-blue-300 bg-gray-100 text-center shadow-md sm:rounded-lg">
                 <div>
                     <h3 className="generic-title">Report del {showReferee === '1st' ? 'primo' : 'secondo'} arbitro</h3>
                 </div>
             </div>
-            <div className="mb-2 py-2 min-w-full px-6 lg:px-8 bg-gray-100 shadow-md sm:rounded-lg">
+            <div className="mb-2 py-2 min-w-full px-6 lg:px-8 bg-gradient-to-r from-red-200 to-red-300 shadow-md sm:rounded-lg">
                 <div className="mb-4">
                     <h3 className="generic-title">Dati Generali</h3>
                 </div>
                 <div className="mb-2 grid grid-cols-2 gap-2 content-center">
+                    {
+                        restricted &&
+                        <>
+                            <span>Codice Report</span>
+                            <span>{ report.shortid }</span>
+                        </>
+                    }
                     <span>Osservatore </span>
                     <span>{ report.general.author.lastname } { report.general.author.firstname }</span>
                     <span>Gara n. </span>
@@ -316,7 +323,7 @@ function ReportPreview({ report, showReferee }) {
                     <span>{ report.general.second_ref?.lastname || '-' } { report.general.second_ref?.firstname || '' }</span>
                     <span>Segnapunti </span>
                     <span>{ report.general.scorer }</span>
-                    { user.admin &&
+                    { user?.admin &&
                         <>
                             <span className="italic">Riepilogo Complessità</span>
                             <span className="value">{complexity.complexity}</span>
@@ -326,69 +333,71 @@ function ReportPreview({ report, showReferee }) {
                     }
                 </div>
             </div>
-            <div className="mb-2 py-2 min-w-full px-6 lg:px-8 bg-gray-100 shadow-md sm:rounded-lg">
-                <div className="mb-4">
-                    <h3 className="generic-title">Dati Gara</h3>
+            { restricted &&
+                <div className="mb-2 py-2 min-w-full px-6 lg:px-8 bg-gray-100 shadow-md sm:rounded-lg">
+                    <div className="mb-4">
+                        <h3 className="generic-title">Dati Gara</h3>
+                    </div>
+                    <div className={`mb-2 grid ${user?.admin ? 'grid-cols-3' : 'grid-cols-2'}  gap-2 content-center`}>
+                        <span>Risultato</span>
+                        <span className={ user?.admin ? "col-span-2" : "col-span-1"}>{ report.match.result }</span>
+                        <span>Durata</span>
+                        <span>{ report.match.duration }</span>
+                        { user?.admin && <span className="value">{complexity.add_duration}</span> }
+                        <span>Spettatori</span>
+                        <span className={ user?.admin ? "col-span-2" : "col-span-1"}>{ report.match.spects }</span>
+                        <span>1° Set</span>
+                        <span className={ user?.admin ? "col-span-2" : "col-span-1"}>{ report.match.pts1set } ({ report.match.dur1set } minuti)</span>
+                        <span>2° Set</span>
+                        <span className={ user?.admin ? "col-span-2" : "col-span-1"}>{ report.match.pts2set } ({ report.match.dur2set } minuti)</span>
+                        { report.match.pts3set && (
+                            <>
+                                <span>3° Set</span>
+                                <span className={ user?.admin ? "col-span-2" : "col-span-1"}>{ report.match.pts3set } ({ report.match.dur3set } minuti)</span>
+                            </>    
+                        ) }
+                        { report.match.pts4set && (
+                            <>
+                                <span>4° Set</span>
+                                <span className={ user?.admin ? "col-span-2" : "col-span-1"}>{ report.match.pts4set } ({ report.match.dur4set } minuti)</span>
+                            </>    
+                        ) }
+                        { report.match.pts5set && (
+                            <>
+                                <span>5° Set</span>
+                                <span className={ user?.admin ? "col-span-2" : "col-span-1"}>{ report.match.pts5set } ({ report.match.dur5set } minuti)</span>
+                            </>    
+                        ) }
+                        { report.match.pts6set && (
+                            <>
+                                <span>Set di Spareggio</span>
+                                <span className={ user?.admin ? "col-span-2" : "col-span-1"}>{ report.match.pts6set } ({ report.match.dur6set } minuti)</span>
+                            </>    
+                        ) }
+                    </div>
                 </div>
-                <div className={`mb-2 grid ${user.admin ? 'grid-cols-3' : 'grid-cols-2'}  gap-2 content-center`}>
-                    <span>Risultato</span>
-                    <span className={ user.admin ? "col-span-2" : "col-span-1"}>{ report.match.result }</span>
-                    <span>Durata</span>
-                    <span>{ report.match.duration }</span>
-                    { user.admin && <span className="value">{complexity.add_duration}</span> }
-                    <span>Spettatori</span>
-                    <span className={ user.admin ? "col-span-2" : "col-span-1"}>{ report.match.spects }</span>
-                    <span>1° Set</span>
-                    <span className={ user.admin ? "col-span-2" : "col-span-1"}>{ report.match.pts1set } ({ report.match.dur1set } minuti)</span>
-                    <span>2° Set</span>
-                    <span className={ user.admin ? "col-span-2" : "col-span-1"}>{ report.match.pts2set } ({ report.match.dur2set } minuti)</span>
-                    { report.match.pts3set && (
-                        <>
-                            <span>3° Set</span>
-                            <span className={ user.admin ? "col-span-2" : "col-span-1"}>{ report.match.pts3set } ({ report.match.dur3set } minuti)</span>
-                        </>    
-                    ) }
-                    { report.match.pts4set && (
-                        <>
-                            <span>4° Set</span>
-                            <span className={ user.admin ? "col-span-2" : "col-span-1"}>{ report.match.pts4set } ({ report.match.dur4set } minuti)</span>
-                        </>    
-                    ) }
-                    { report.match.pts5set && (
-                        <>
-                            <span>5° Set</span>
-                            <span className={ user.admin ? "col-span-2" : "col-span-1"}>{ report.match.pts5set } ({ report.match.dur5set } minuti)</span>
-                        </>    
-                    ) }
-                    { report.match.pts6set && (
-                        <>
-                            <span>Set di Spareggio</span>
-                            <span className={ user.admin ? "col-span-2" : "col-span-1"}>{ report.match.pts6set } ({ report.match.dur6set } minuti)</span>
-                        </>    
-                    ) }
-                </div>
-            </div>
-            <div className="mb-2 py-2 min-w-full px-6 lg:px-8 bg-gray-100 shadow-md sm:rounded-lg">
+            }
+            <div className="mb-2 py-2 min-w-full px-6 lg:px-8 bg-gradient-to-l from-orange-100 to-orange-200 shadow-md sm:rounded-lg">
                 <div className="mb-4">
                     <h3 className="generic-title">Area Immagine</h3>
                 </div>
-                <div className={`mb-2 grid ${user.admin ? 'grid-cols-3' : 'grid-cols-2'}  gap-2 content-center`}>
+                <div className={`mb-2 grid ${user?.admin ? 'grid-cols-3' : 'grid-cols-2'}  gap-2 content-center`}>
                     <span>Aspetto Adeguato</span>
                     <span>{ showReferee === '1st' ? options[report.image.aspect1ref] : options[report.image.aspect2ref] }</span>
-                    { user.admin && <span className={ results.aspect.result >= 0 ? 'bonus' : 'penalty'}>{ results.aspect.result }</span> }
+                    { user?.admin && <span className={ results.aspect.result >= 0 ? 'bonus' : 'penalty'}>{ results.aspect.result }</span> }
                     <span>Ritardato arrivo presso l'impianto</span>
                     <span>{ showReferee === '1st' ? delays[report.image.delay1ref] : delays[report.image.delay2ref] }</span>
-                    { user.admin && <span className={ results.delay.result >= 0 ? 'bonus' : 'penalty'}>{ results.delay.result }</span> }
+                    { user?.admin && <span className={ results.delay.result >= 0 ? 'bonus' : 'penalty'}>{ results.delay.result }</span> }
                     <span>Fasi Protocollari (tutte)</span>
                     <span>{ showReferee === '1st' ? options[report.image.prot1ref] : options[report.image.prot2ref] }</span>
-                    { user.admin && <span className={ results.prot.result >= 0 ? 'bonus' : 'penalty'}>{ results.prot.result }</span> }
+                    { user?.admin && <span className={ results.prot.result >= 0 ? 'bonus' : 'penalty'}>{ results.prot.result }</span> }
                     <span>Fischio, segnaletica e postura</span>
                     <span>{ showReferee === '1st' ? options[report.image.whistle1ref] : options[report.image.whistle2ref] }</span>
-                    { user.admin && <span className={ results.whistle.result >= 0 ? 'bonus' : 'penalty'}>{ results.whistle.result }</span> }
+                    { user?.admin && <span className={ results.whistle.result >= 0 ? 'bonus' : 'penalty'}>{ results.whistle.result }</span> }
                     <span>Gestione istanze</span>
                     <span>{ showReferee === '1st' ? options[report.image.complaint1ref] : options[report.image.complaint2ref] }</span>
-                    { user.admin && <span className={ results.complaint.result >= 0 ? 'bonus' : 'penalty'}>{ results.complaint.result }</span> }
-                    { user.admin && 
+                    { user?.admin && <span className={ results.complaint.result >= 0 ? 'bonus' : 'penalty'}>{ results.complaint.result }</span> }
+                    { user?.admin && 
                         <>
                             <span>Note</span>
                             <span className="col-span-2">{ report.image.image_notes }</span>
@@ -396,17 +405,17 @@ function ReportPreview({ report, showReferee }) {
                     }
                 </div>
             </div>
-            <div className="mb-2 py-2 min-w-full px-6 lg:px-8 bg-gray-100 shadow-md sm:rounded-lg">
+            <div className="mb-2 py-2 min-w-full px-6 lg:px-8 bg-gradient-to-r from-green-100 to-green-200 shadow-md sm:rounded-lg">
                 <div className="mb-4">
                     <h3 className="generic-title">Area Tecnica</h3>
                 </div>
-                <div className={`mb-4 grid ${user.admin ? 'grid-cols-3' : 'grid-cols-2'}  gap-2 content-center`}>
+                <div className={`mb-4 grid ${user?.admin ? 'grid-cols-3' : 'grid-cols-2'}  gap-2 content-center`}>
                     <span>Complessità Tecnica</span>
                     <span>{ difficulty[report.technical.complexity] }</span>
-                    { user.admin && <span className="value">{complexity.tech_complexity}</span> }
+                    { user?.admin && <span className="value">{complexity.tech_complexity}</span> }
                     <span>Tecnica Arbitrale</span>
                     <span>{ showReferee === '1st' ? options[report.technical.tech1ref] : options[report.technical.tech2ref] }</span>
-                    { user.admin && <span className={ results.technic.result >= 0 ? 'bonus' : 'penalty'}>{ results.technic.result }</span> }
+                    { user?.admin && <span className={ results.technic.result >= 0 ? 'bonus' : 'penalty'}>{ results.technic.result }</span> }
                 </div>
                 <div className="mb-2 grid grid-cols-3 gap-2 content-center">
                     <h3 className="generic-title text-sm">Errori</h3>
@@ -465,18 +474,18 @@ function ReportPreview({ report, showReferee }) {
                     <span>{ showReferee === '1st' ? report.technical.otherfaults_ord_1ref : report.technical.otherfaults_ord_2ref }</span>
                     <span>{ showReferee === '1st' ? report.technical.otherfaults_sev_1ref : report.technical.otherfaults_sev_2ref }</span>
                 </div>
-                { user.admin && 
+                { user?.admin && 
                     <div className="mb-2 grid grid-cols-2 gap-2 content-center italic">
                         <span>Tot. errori di 1° Livello</span>
-                        <span className={ results.errors_1st.result[0] >= 0 ? 'bonus' : 'penalty'}>{ results.errors_1st.result }</span>
+                        <span className={ results.errors_1st.result < 0 ? 'penalty' : 'bonus' }>{ results.errors_1st.result }</span>
                         <span>Tot. errori di 2° Livello</span>
-                        <span className={ results.errors_2nd.result[1] >= 0 ? 'bonus' : 'penalty'}>{ results.errors_2nd.result }</span>
+                        <span className={ results.errors_2nd.result < 0 ? 'penalty' : 'bonus' }>{ results.errors_2nd.result }</span>
                         <span>Tot. errori di 3° Livello</span>
-                        <span className={ results.errors_3rd.result[2] >= 0 ? 'bonus' : 'penalty'}>{ results.errors_3rd.result }</span>
+                        <span className={ results.errors_3rd.result < 0 ? 'penalty' : 'bonus' }>{ results.errors_3rd.result }</span>
                     </div>
                 }
-                <div className={`mb-2 grid ${user.admin ? 'grid-cols-3' : 'grid-cols-2'}  gap-2 content-center`}>
-                    { user.admin && 
+                <div className={`mb-2 grid ${user?.admin ? 'grid-cols-3' : 'grid-cols-2'}  gap-2 content-center`}>
+                    { user?.admin && 
                         <>
                             <span>Note</span>
                             <span className="col-span-2">{ report.technical.error_notes }</span>
@@ -484,8 +493,8 @@ function ReportPreview({ report, showReferee }) {
                     }
                     <span>Collaborazione tecnica</span>
                     <span>{ showReferee === '1st' ? options[report.technical.collab1ref] : options[report.technical.collab2ref] }</span>
-                    { user.admin && <span className={ results.collab.result >= 0 ? 'bonus' : 'penalty'}>{ results.collab.result }</span> }
-                    { user.admin &&
+                    { user?.admin && <span className={ results.collab.result >= 0 ? 'bonus' : 'penalty'}>{ results.collab.result }</span> }
+                    { user?.admin &&
                         <>
                             <span>Note</span>
                             <span className="col-span-2">{ report.technical.collab_notes }</span>
@@ -493,21 +502,21 @@ function ReportPreview({ report, showReferee }) {
                     }
                 </div>
             </div>
-            <div className="mb-2 py-2 min-w-full px-6 lg:px-8 bg-gray-100 shadow-md sm:rounded-lg">
+            <div className="mb-2 py-2 min-w-full px-6 lg:px-8 bg-gradient-to-l from-purple-100 to-purple-200 shadow-md sm:rounded-lg">
                 <div className="mb-4">
                     <h3 className="generic-title">Area Relazionale</h3>
                 </div>
-                <div className={`mb-2 grid ${user.admin ? 'grid-cols-3' : 'grid-cols-2'}  gap-2 content-center`}>
+                <div className={`mb-2 grid ${user?.admin ? 'grid-cols-3' : 'grid-cols-2'}  gap-2 content-center`}>
                     <span>Complessità gestionale</span>
                     <span>{ difficulty[report.relational.gest_difficulty] }</span>
-                    { user.admin && <span className="value">{complexity.gest_complexity}</span> }
+                    { user?.admin && <span className="value">{complexity.gest_complexity}</span> }
                     <span>Gestione e Autorevolezza</span>
                     <span>{ showReferee === '1st' ? options[report.relational.gest1ref] : options[report.relational.gest2ref] }</span>
-                    { user.admin && <span className={ results.gest.result >= 0 ? 'bonus' : 'penalty'}>{ results.gest.result }</span> }
+                    { user?.admin && <span className={ results.gest.result >= 0 ? 'bonus' : 'penalty'}>{ results.gest.result }</span> }
                     <span>Livello di concentrazione (era in linea con l'evento?)</span>
                     <span>{ showReferee === '1st' ? options[report.relational.conc1ref] : options[report.relational.conc2ref] }</span>
-                    { user.admin && <span className={ results.conc.result >= 0 ? 'bonus' : 'penalty'}>{ results.conc.result }</span> }
-                    { user.admin && 
+                    { user?.admin && <span className={ results.conc.result >= 0 ? 'bonus' : 'penalty'}>{ results.conc.result }</span> }
+                    { user?.admin && 
                         <>
                             <span>Note</span>
                             <span className="col-span-2">{ difficulty[report.relational.rel_notes] }</span>
@@ -515,14 +524,14 @@ function ReportPreview({ report, showReferee }) {
                     }
                 </div>
             </div>
-            <div className="mb-2 py-2 min-w-full px-6 lg:px-8 bg-gray-100 shadow-md sm:rounded-lg">
+            <div className="mb-2 py-2 min-w-full px-6 lg:px-8 bg-gradient-to-r from-yellow-50 to-yellow-100 shadow-md sm:rounded-lg">
                 <div className="mb-4">
                     <h3 className="generic-title">Area Disciplinare</h3>
                 </div>
-                <div className={`mb-2 grid ${user.admin ? 'grid-cols-3' : 'grid-cols-2'}  gap-2 content-center`}>
+                <div className={`mb-2 grid ${user?.admin ? 'grid-cols-3' : 'grid-cols-2'}  gap-2 content-center`}>
                     <span>Complessità gestionale</span>
                     <span>{ difficulty[report.discipline.gest_discipline] }</span>
-                    { user.admin && <span className="value">{complexity.gest_complexity}</span> }
+                    { user?.admin && <span className="value">{complexity.gest_complexity}</span> }
                 </div>
                 <div className="mb-2 grid grid-cols-5 gap-2 content-center">
                     <span>Avv. verbali</span>
@@ -536,7 +545,7 @@ function ReportPreview({ report, showReferee }) {
                     <span>{ report.discipline.d_expulsions }</span>
                     <span>{ report.discipline.d_squalifications }</span>
                 </div>
-                <div className={`mb-2 grid ${user.admin ? 'grid-cols-3' : 'grid-cols-2'}  gap-2 content-center`}>
+                <div className={`mb-2 grid ${user?.admin ? 'grid-cols-3' : 'grid-cols-2'}  gap-2 content-center`}>
                     { showReferee === '1st' && (
                         <>
                             <span>Amministrazione della disciplina</span>
@@ -549,11 +558,11 @@ function ReportPreview({ report, showReferee }) {
                             <span>{ difficulty[report.discipline.disc_interation] }</span>
                         </>
                     ) }
-                    { user.admin && <span className={ results.disc.result >= 0 ? 'bonus' : 'penalty'}>{ results.disc.result }</span> }
+                    { user?.admin && <span className={ results.disc.result >= 0 ? 'bonus' : 'penalty'}>{ results.disc.result }</span> }
                     <span>Richieste improprie e ritardi di gioco</span>
                     <span>{ showReferee === '1st' ? options[report.discipline.delays1ref] : options[report.discipline.delays2ref] }</span>
-                    { user.admin && <span className={ results.delays.result >= 0 ? 'bonus' : 'penalty'}>{ results.delays.result }</span> }
-                    { user.admin && 
+                    { user?.admin && <span className={ results.delays.result >= 0 ? 'bonus' : 'penalty'}>{ results.delays.result }</span> }
+                    { user?.admin && 
                         <>
                             <span>Note</span>
                             <span className="col-span-2">{ report.discipline.disc_notes }</span>
@@ -561,15 +570,15 @@ function ReportPreview({ report, showReferee }) {
                     }
                 </div>
             </div>
-            <div className="mb-2 py-2 min-w-full px-6 lg:px-8 bg-gray-100 shadow-md sm:rounded-lg">
+            <div className="mb-2 py-2 min-w-full px-6 lg:px-8 bg-gradient-to-l from-blue-100 to-blue-200 shadow-md sm:rounded-lg">
                 <div className="mb-4">
                     <h3 className="generic-title">Colloquio</h3>
                 </div>
-                <div className={`mb-2 grid ${user.admin ? 'grid-cols-3' : 'grid-cols-2'}  gap-2 content-center`}>
+                <div className={`mb-2 grid ${user?.admin ? 'grid-cols-3' : 'grid-cols-2'}  gap-2 content-center`}>
                     <span>Reattività al colloquio</span>
                     <span>{ showReferee === '1st' ? interview[report.interview.interview1ref] : interview[report.interview.interview2ref] }</span>
-                    { user.admin && <span className={ results.interview.result >= 0 ? 'bonus' : 'penalty'}>{ results.interview.result }</span> }
-                    { user.admin && 
+                    { user?.admin && <span className={ results.interview.result >= 0 ? 'bonus' : 'penalty'}>{ results.interview.result }</span> }
+                    { user?.admin && 
                         <>
                             <span>Note</span>
                             <span className="col-span-2">{ report.interview.interview_notes }</span>
@@ -577,15 +586,17 @@ function ReportPreview({ report, showReferee }) {
                     }
                 </div>
             </div>
-            <div className="mb-2 py-2 min-w-full px-6 lg:px-8 bg-gray-100 shadow-md sm:rounded-lg">
-                <div className="mb-4">
-                    <h3 className="generic-title">Eventi particolari e potenzialità</h3>
+            { restricted &&
+                <div className="mb-2 py-2 min-w-full px-6 lg:px-8 bg-gray-100 shadow-md sm:rounded-lg">
+                    <div className="mb-4">
+                        <h3 className="generic-title">Eventi particolari e potenzialità</h3>
+                    </div>
+                    <div className="mb-2 grid grid-cols-2 gap-2 content-center">
+                        <span>Valutazione prestazioni arbitrali</span>
+                        <span>{ showReferee === '1st' ? votes[report.events.finalvote1ref] : votes[report.events.finalvote2ref] }</span>
+                    </div>
                 </div>
-                <div className="mb-2 grid grid-cols-2 gap-2 content-center">
-                    <span>Valutazione prestazioni arbitrali</span>
-                    <span>{ showReferee === '1st' ? votes[report.events.finalvote1ref] : votes[report.events.finalvote2ref] }</span>
-                </div>
-            </div>
+            }
         </div>
     )
 }

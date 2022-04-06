@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { serviceProvider as API } from "../../API/api";
+import genShortid from "../../lib/genericUtils";
 
 // Context
 import { useAuth } from "../../contexts/userContext";
@@ -15,6 +16,7 @@ function Reports() {
     const [ user ] = useAuth();
     const blankReport = {
         _id: undefined,
+        shortid: genShortid(),
         valid: false,
         // Dati Generali
         general: {
@@ -268,7 +270,7 @@ function Reports() {
             }
             { button === 'edit' && <ReportForm report={report} setReport={setReport} toggleModal={toggleModal} /> }
             { button === 'new' && <ReportTable allReports={allReports} reports={reports} setAction={setAction} setButton={setButton} setCompleteReport={setCompleteReport} setReport={setReport} setReports={setReports} toggleModal={toggleModal} /> }
-            { button === 'preview' && <ReportPreview report={completeReport} showReferee={showReferee} /> }
+            { button === 'preview' && <ReportPreview report={completeReport} restricted={true} showReferee={showReferee} /> }
             <ReportModal 
                 action={action}
                 modal={modal} 

@@ -7,6 +7,7 @@ import Footer     from './components/Footer';
 import Header     from './components/Header';
 import Navbar     from './components/Navbar';
 import Referees   from './components/admin/Referees';
+import Report     from './components/user/Report';
 import Reports    from './components/user/Reports';
 import Title      from './components/Title';
 
@@ -15,6 +16,7 @@ import { RequireAdmin, RequireUser } from './requireAuth';
 
 // Context
 import TitleProvider, { useTitle } from './contexts/titleContext';
+import ReportProvider from './contexts/reportContext';
 import UserProvider from './contexts/userContext';
 
 
@@ -25,7 +27,9 @@ function App() {
     <Router>
       <TitleProvider>
         <UserProvider>
-          <Main />
+          <ReportProvider>
+            <Main />
+          </ReportProvider>
         </UserProvider>
       </TitleProvider>
     </Router>
@@ -68,6 +72,12 @@ function Main() {
               <RequireUser>
                 <Reports />
               </RequireUser>
+            }
+          />
+          <Route
+            path="/visualizza-report"
+            element={
+              <Report />
             }
           />
         </Routes>

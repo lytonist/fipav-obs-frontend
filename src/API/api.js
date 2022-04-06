@@ -45,6 +45,18 @@ const authProvider = {
         setUser(undefined);
     },
 
+    accessReport: async body => {
+        const response = await fetchData('report-access', 'POST', body).catch(err => console.error(err));
+        return response;
+            /* .then(response => {
+                return response;
+            })
+            .catch(err => {
+                console.error(err);
+                setError('Qualcosa è andato storto');
+            }); */
+    },
+
     verifyLogin: async () => {
         const token = getToken();
         const decoded = token ? decode(token) : undefined;
